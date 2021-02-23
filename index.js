@@ -87,3 +87,48 @@ const addMenu = () => {
     });
 };
 
+const addDepartment = () => {
+    inquirer.prompt([
+        {
+            name: 'departmentName',
+            type: 'input',
+            message: 'New department name:'
+        }
+    ])
+    .then((answer) => {
+        // Format answer
+        let departmentNameLower = answer.departmentName.toLowerCase();
+        let departmentNameArr = departmentNameLower.split(' ');
+        let departmentNameSentence = '';
+        for (let i = 0; i < departmentNameArr.length; i++) {
+            let substring = departmentNameArr[i].substring(0, 1).toUpperCase() + departmentNameArr[i].substring(1, departmentNameArr[i].length);
+            departmentNameSentence += substring + ' ';
+        }
+
+        // connection.query(
+        //     `INSERT INTO department(name) VALUES('${departmentNameLower}')`,
+        //     (err, res) => {
+        //         if (err) throw err;
+        //         console.log(`${departmentNameSentence} department successfully added to database!`);
+        //     }
+        // )
+    })
+}
+// const addEmployee = () => {
+//     inquirer.prompt([
+//         {
+//             name: 'employeeFirstName',
+//             type: 'input',
+//             message: 'New employee first name:'
+//         },
+//         {
+//             name: 'employeeLastName',
+//             type: 'input',
+//             message: 'New employee last name:'
+//         }
+//     ])
+//     connection.query(
+//         'INSERT INTO employee (first_name, last_name, role_id, manager_id)'
+//     )
+// }
+
