@@ -8,3 +8,8 @@ CREATE TABLE employee (
     first_name VARCHAR(30),
     last_name VARCHAR(30)
 );
+
+CREATE TABLE role (
+    title VARCHAR(30),
+    salary DECIMAL
+);
