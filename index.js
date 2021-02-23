@@ -2,7 +2,10 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const { allowedNodeEnvironmentFlags } = require('process');
+
+// Database components
+let departments = [];
+let roles = [];
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -117,6 +120,35 @@ const addDepartment = () => {
             }
         )
     })
+}
+
+const addRole = () => {
+    connection.query(
+        'SELECT name FROM department', (err, res) => {
+            if (err) throw err;
+            res.forEach(({ name }) => {
+                roles.push(name);
+            })
+            inquirer.prompt([
+                {
+                    name: 'roleTitle',
+                    type: 'input',
+                    message: 'New role title:'
+                },
+                {
+                    name: 'roleSalary',
+                    type: 'input',
+                    message: 'New role salary:'
+                },
+                {
+                    name: 'roleDepartment',
+                    type: 'list',
+                    message: 'New role department:',
+                    choices: roles
+                }
+            ])
+        }
+    )    
 }
 // const addEmployee = () => {
 //     inquirer.prompt([
