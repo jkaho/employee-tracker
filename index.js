@@ -5,9 +5,9 @@ const cTable = require('console.table');
 
 // Database components
 let departments = [];
-let departmentNames = [];
+let departmentNames = ['No existing departments in database'];
 let roles = [];
-let roleTitles = [];
+let roleTitles = ['No existing roles in database'];
 let employees = [];
 let employeeNames = ['No existing employees in database'];
 
@@ -138,8 +138,24 @@ const addRole = () => {
             if (err) throw err;
             res.forEach(({ id, name }) => {
                 departments.push({id, name});
-                departmentNames.push(`${id} | ${name}`);
             });
+            if (departmentNames[0] === 'No existing departments in database') {
+                departmentNames.splice(0, 1);
+            }
+            res.forEach((item) => {
+                let departmentNameLower = item.name.toLowerCase();
+                let departmentNameArr = departmentNameLower.split(' ');
+                let departmentNameSentence = '';
+                for (let i = 0; i < departmentNameArr.length; i++) {
+                    let substring = departmentNameArr[i].substring(0, 1).toUpperCase() + departmentNameArr[i].substring(1, departmentNameArr[i].length);
+                    if (i === departmentNameArr.length - 1) {
+                        departmentNameSentence += substring;
+                    } else {
+                        departmentNameSentence += substring + ' ';
+                    }
+                }
+                departmentNames.push(`${item.id} | ${departmentNameSentence}`);
+            })
             inquirer.prompt([
                 {
                     name: 'roleTitle',
@@ -174,15 +190,17 @@ const addRole = () => {
 
                 let departmentId = '';
                 let splitAnswer = answers.roleDepartment.split(' ');
+                let departmentName = splitAnswer.splice(2).join(' ').trim();
+                let departmentNameLower = departmentName.toLowerCase();
                 for (let i = 0; i < departments.length; i++) {
-                    if (departments[i].name === splitAnswer[2]) {
+                    if (departments[i].name === departmentNameLower) {
                         departmentId = departments[i].id;
                     }
                 }
                 connection.query(
                     `INSERT INTO role(title, salary, department_id) VALUES ('${roleTitleLower}', '${answers.roleSalary}', '${departmentId}')`, (err, res) => {
                         if (err) throw err;
-                        console.log(`Role successfully added!\nRole: ${roleTitleSentence}\nSalary: ${answers.roleSalary}\nDepartment: ${splitAnswer[2]}`);
+                        console.log(`Role successfully added!\nRole: ${roleTitleSentence}\nSalary: ${answers.roleSalary}\nDepartment: ${departmentName}`);
                     }
                 )
             });
@@ -198,6 +216,9 @@ const addEmployee = () => {
             res.forEach(({ id, title, salary, department_id }) => {
                 roles.push({id, title, salary, department_id});
             });
+            if (roleTitles[0] === 'No existing roles in database') {
+                roleTitles.splice(0, 1);
+            }
             // Format role titles for prompt
             res.forEach((item) => {
                 let roleTitleArr = item.title.split(' ');
@@ -247,6 +268,9 @@ const addEmployee = () => {
                         res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
                             employees.push({id, first_name, last_name, role_id, manager_id});
                         });
+                        if (employeeNames[0] === 'No existing employees in database') {
+                            employeeNames.splice(0, 1);
+                        }
                         res.forEach((item) => {
                             let employeeFirstNameArr = item.first_name.split(' ');
                             let employeeLastNameArr = item.last_name.split(' ');
@@ -268,9 +292,6 @@ const addEmployee = () => {
                                 } else {
                                     employeeLastNameCap += substring + ' ';
                                 }
-                            }
-                            if (employeeNames.length === 1) {
-                                employeeNames.splice(0, 1);
                             }
                             employeeNames.push(`${item.id} | ${employeeFirstNameCap} ${employeeLastNameCap}`);
                         });
