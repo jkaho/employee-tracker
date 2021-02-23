@@ -22,6 +22,6 @@ CREATE TABLE role (
 
 CREATE TABLE department (
     id INT AUTO_INCREMENT NOT NULL,
-    PRIMARY KEY(id),
-    name VARCHAR(30)
+    name VARCHAR(30),
+    PRIMARY KEY(id)
 );
