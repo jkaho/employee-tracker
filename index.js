@@ -147,6 +147,20 @@ const addRole = () => {
                     choices: roles
                 }
             ])
+            .then((answers) => {
+                // Format role title answer
+                let roleTitleLower = answers.roleTitle.toLowerCase();
+                let roleTitleArr = roleTitleLower.split(' ');
+                let roleTitleSentence = '';
+                for (let i = 0; i < roleTitleArr.length; i++) {
+                    let substring = roleTitleArr[i].substring(0, 1).toUpperCase() + roleTitleArr[i].substring(1, roleTitleArr[i].length);
+                    if (i === roleTitleArr.length - 1) {
+                        roleTitleSentence += substring;
+                    } else {
+                        roleTitleSentence += substring + ' ';
+                    }
+                }
+            })
         }
     )    
 }
