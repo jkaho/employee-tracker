@@ -27,6 +27,7 @@ connection.connect((err) => {
     actionMenu();
 });
 
+// ACTION MENU 
 const actionMenu = () => {
     inquirer.prompt([
         {
@@ -42,6 +43,7 @@ const actionMenu = () => {
         }
     ])
     .then((answer) => {
+        // Continue to next menu
         switch(answer.action) {
             case 'Add data':
                 addMenu();
@@ -62,6 +64,7 @@ const actionMenu = () => {
     });
 };
 
+// ADD EMPLOYEE/ROLE/DEPARTMENT MENU 
 const addMenu = () => {
     inquirer.prompt([
         {
@@ -77,6 +80,7 @@ const addMenu = () => {
         }
     ])
     .then((answer) => {
+        // Continue to functions
         switch(answer.addAction) {
             case 'Add an employee':
                 addEmployee();
@@ -94,6 +98,7 @@ const addMenu = () => {
     });
 };
 
+// Function for adding a department
 const addDepartment = () => {
     inquirer.prompt([
         {
@@ -126,6 +131,7 @@ const addDepartment = () => {
     })
 }
 
+// Function for adding a role
 const addRole = () => {
     connection.query(
         'SELECT * FROM department', (err, res) => {
@@ -184,6 +190,7 @@ const addRole = () => {
     );    
 };
 
+// Function for adding an employee
 const addEmployee = () => {
     connection.query(
         'SELECT * FROM role', (err, res) => {
@@ -237,7 +244,6 @@ const addEmployee = () => {
                 connection.query(
                     'SELECT * FROM employee', (err, res) => {
                         if (err) throw err;
-
                         res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
                             employees.push({id, first_name, last_name, role_id, manager_id});
                         });
@@ -304,9 +310,5 @@ const addEmployee = () => {
             })
         }
     )
-
-    // connection.query(
-    //     'INSERT INTO employee (first_name, last_name, role_id, manager_id)'
-    // )
 }
 
