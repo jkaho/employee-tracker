@@ -9,7 +9,7 @@ let departmentNames = [];
 let roles = [];
 let roleTitles = [];
 let employees = [];
-let employeeNames = [];
+let employeeNames = ['No existing employees in database'];
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -225,10 +225,80 @@ const addEmployee = () => {
                 }
             ])
             .then((answers) => {
+                let employeeFirstName = answers.employeeFirstName;
+                let employeeLastName = answers.employeeLastName;
+                let employeeRole = answers.employeeRole;
+                let roleId = '';
+                for (let i = 0; i < roles.length; i++) {
+                    if (roles[i].title === answers.employeeRole.toLowerCase()) {
+                        roleId = roles[i].id;
+                    }
+                }
                 connection.query(
-                    'SELECT id, name FROM employee', (err, res) => {
+                    'SELECT * FROM employee', (err, res) => {
                         if (err) throw err;
 
+                        res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
+                            employees.push({id, first_name, last_name, role_id, manager_id});
+                        });
+                        res.forEach((item) => {
+                            let employeeFirstNameArr = item.first_name.split(' ');
+                            let employeeLastNameArr = item.last_name.split(' ');
+                            let employeeFirstNameCap = '';
+                            let employeeLastNameCap = '';
+            
+                            for (let i = 0; i < employeeFirstNameArr.length; i++) {
+                                let substring = employeeFirstNameArr[i].substring(0, 1).toUpperCase() + employeeFirstNameArr[i].substring(1, employeeFirstNameArr[i].length);
+                                if (i === employeeFirstNameArr.length - 1) {
+                                    employeeFirstNameCap += substring;
+                                } else {
+                                    employeeFirstNameCap += substring + ' ';
+                                }
+                            }
+                            for (let i = 0; i < employeeLastNameArr.length; i++) {
+                                let substring = employeeLastNameArr[i].substring(0, 1).toUpperCase() + employeeLastNameArr[i].substring(1, employeeLastNameArr[i].length);
+                                if (i === employeeLastNameArr.length - 1) {
+                                    employeeLastNameCap += substring;
+                                } else {
+                                    employeeLastNameCap += substring + ' ';
+                                }
+                            }
+                            if (employeeNames.length === 1) {
+                                employeeNames.splice(0, 1);
+                            }
+                            employeeNames.push(`${item.id} | ${employeeFirstNameCap} ${employeeLastNameCap}`);
+                        });
+                        inquirer.prompt([
+                            {
+                                name: 'employeeManager',
+                                type: 'list',
+                                message: 'New employee manager:',
+                                choices: employeeNames
+                            }
+                        ])
+                        .then((answer) => {    
+                            let managerId = '';
+                            let splitAnswer = answer.employeeManager.split(' ');
+                            let managerName = '';                      
+                            if (answer.employeeManager === 'No existing employees in database') {
+                                managerId = null;
+                                managerName = 'No existing managers'
+                            } else {
+                                managerName = splitAnswer.splice(0, 2).join(' ');  
+                                for (let i = 0; i < employees.length; i++) {
+                                    if (employees[i].id === parseInt(splitAnswer[0])) {
+                                        managerId = employees[i].id;
+                                    }
+                                }
+                            }
+
+                            query = 'INSERT INTO employee(first_name, last_name, role_id, manager_id) ';
+                            query += `VALUES('${employeeFirstName}', '${employeeLastName}', ${roleId}, ${managerId})`
+                            connection.query(query, (err, res) => {
+                                if (err) throw err;
+                                console.log(`Employee successfully added!\nName: ${employeeFirstName} ${employeeLastName}\nRole: ${employeeRole}\nManager: ${managerName}`);
+                            })
+                        });
                     }
                 )
             })
