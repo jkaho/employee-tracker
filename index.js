@@ -2,6 +2,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+const { allowedNodeEnvironmentFlags } = require('process');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -16,13 +17,14 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) throw err;
+    actionMenu();
 });
 
 const actionMenu = () => {
     inquirer.prompt([
         {
             name: 'action',
-            type: 'rawlist',
+            type: 'list',
             message: '----------MENU----------\nWhat would you like to do?',
             choices: [
                 'Add data',
@@ -50,5 +52,38 @@ const actionMenu = () => {
                 console.log('Invalid action');
                 break;
         }
-    })
-}
+    });
+};
+
+const addMenu = () => {
+    inquirer.prompt([
+        {
+            name: 'addAction',
+            type: 'list',
+            message: '----------ADD MENU----------\nWhat would you like to do?',
+            choices: [
+                'Add an employee',
+                'Add a role',
+                'Add a department',
+                'Go back'
+            ]
+        }
+    ])
+    .then((answer) => {
+        switch(answer.addAction) {
+            case 'Add an employee':
+                addEmployee();
+                break;
+            case 'Add a role':
+                addRole();
+                break;
+            case 'Add a department':
+                addDepartment();
+                break;
+            default:
+                actionMenu();
+                break;
+        }
+    });
+};
+
