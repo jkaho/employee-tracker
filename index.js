@@ -5,7 +5,9 @@ const cTable = require('console.table');
 
 // Database components
 let departments = [];
+let departmentNames = [];
 let roles = [];
+let roleTitles = [];
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -124,10 +126,11 @@ const addDepartment = () => {
 
 const addRole = () => {
     connection.query(
-        'SELECT name FROM department', (err, res) => {
+        'SELECT * FROM department', (err, res) => {
             if (err) throw err;
-            res.forEach(({ name }) => {
-                roles.push(name);
+            res.forEach(({ id, name }) => {
+                departments.push({id, name});
+                departmentNames.push(`${id} | ${name}`);
             })
             inquirer.prompt([
                 {
@@ -144,7 +147,7 @@ const addRole = () => {
                     name: 'roleDepartment',
                     type: 'list',
                     message: 'New role department:',
-                    choices: roles
+                    choices: departmentNames
                 }
             ])
             .then((answers) => {
@@ -160,10 +163,24 @@ const addRole = () => {
                         roleTitleSentence += substring + ' ';
                     }
                 }
-            })
+
+                let departmentId = '';
+                let splitAnswer = answers.roleDepartment.split(' ');
+                for (let i = 0; i < departments.length; i++) {
+                    if (departments[i].name === splitAnswer[2]) {
+                        departmentId = departments[i].id;
+                    }
+                }
+                connection.query(
+                    `INSERT INTO role(title, salary, department_id) VALUES ('${roleTitleLower}', '${answers.roleSalary}', '${departmentId}')`, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Role successfully added!\nRole: ${roleTitleSentence}\nSalary: ${answers.roleSalary}\nDepartment: ${splitAnswer[2]}`);
+                    }
+                )
+            });
         }
-    )    
-}
+    );    
+};
 // const addEmployee = () => {
 //     inquirer.prompt([
 //         {
