@@ -8,6 +8,8 @@ let departments = [];
 let departmentNames = [];
 let roles = [];
 let roleTitles = [];
+let employees = [];
+let employeeNames = [];
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -131,7 +133,7 @@ const addRole = () => {
             res.forEach(({ id, name }) => {
                 departments.push({id, name});
                 departmentNames.push(`${id} | ${name}`);
-            })
+            });
             inquirer.prompt([
                 {
                     name: 'roleTitle',
@@ -181,21 +183,60 @@ const addRole = () => {
         }
     );    
 };
-// const addEmployee = () => {
-//     inquirer.prompt([
-//         {
-//             name: 'employeeFirstName',
-//             type: 'input',
-//             message: 'New employee first name:'
-//         },
-//         {
-//             name: 'employeeLastName',
-//             type: 'input',
-//             message: 'New employee last name:'
-//         }
-//     ])
-//     connection.query(
-//         'INSERT INTO employee (first_name, last_name, role_id, manager_id)'
-//     )
-// }
+
+const addEmployee = () => {
+    connection.query(
+        'SELECT * FROM role', (err, res) => {
+            if (err) throw err;
+            res.forEach(({ id, title, salary, department_id }) => {
+                roles.push({id, title, salary, department_id});
+            });
+            // Format role titles for prompt
+            res.forEach((item) => {
+                let roleTitleArr = item.title.split(' ');
+                let roleTitleSentence = '';
+
+                for (let i = 0; i < roleTitleArr.length; i++) {
+                    let substring = roleTitleArr[i].substring(0, 1).toUpperCase() + roleTitleArr[i].substring(1, roleTitleArr[i].length);
+                    if (i === roleTitleArr.length - 1) {
+                        roleTitleSentence += substring;
+                    } else {
+                        roleTitleSentence += substring + ' ';
+                    }
+                }
+                roleTitles.push(roleTitleSentence);
+            })
+            inquirer.prompt([
+                {
+                    name: 'employeeFirstName',
+                    type: 'input',
+                    message: 'New employee first name:'
+                },
+                {
+                    name: 'employeeLastName',
+                    type: 'input',
+                    message: 'New employee last name:'
+                },
+                {
+                    name: 'employeeRole',
+                    type: 'list',
+                    message: 'New employee role:',
+                    choices: roleTitles
+                }
+            ])
+            .then((answers) => {
+                connection.query(
+                    'SELECT id, name FROM employee', (err, res) => {
+                        if (err) throw err;
+
+                    }
+                )
+            })
+        }
+    )
+
+    // connection.query(
+    //     'INSERT INTO employee (first_name, last_name, role_id, manager_id)'
+    // )
+}
 
