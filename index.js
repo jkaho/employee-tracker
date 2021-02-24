@@ -1006,11 +1006,50 @@ const deleteEmployee = () => {
                                             console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
                                             setTimeout(deleteMenu, 2000);
                                         });
+                                    } else {
+                                        deleteMenu();
                                     };
                                 });
                             };
                         });
                     });
+                    break;
+                case 'View all employees':
+                    inquirer.prompt([
+                        {
+                            name: 'employeeList',
+                            type: 'list',
+                            message: 'Select an employee to delete from the list:',
+                            choices: employeeNames
+                        }
+                    ])
+                    .then((answer) => {
+                        let name = answer.employeeList.split(' ').slice(2, answer.employeeList.split(' ').length - 2).join(' ').trim();
+                        let employeeId = parseInt(answer.employeeList.split(' ').splice(0, 1));
+
+                        inquirer.prompt([
+                            {
+                                name: 'confirmation',
+                                type: 'confirm', 
+                                message: `Are you sure you want to delete employee '${name}' (id: ${employeeId})?`
+                            }
+                        ])
+                        .then((answer) => {
+                            if (answer.confirmation === true) {
+                                connection.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                                    if (err) throw err;
+                                    console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
+                                    setTimeout(deleteMenu, 2000);
+                                });
+                            } else {
+                                deleteMenu();
+                            };
+                        });
+                    });
+                    break;
+                default:
+                    deleteMenu();
+                    break;
             };
         });
     });
