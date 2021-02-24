@@ -696,6 +696,7 @@ const updateRoleMenu = () => {
     let roleTitles = ['No existing roles in database'];
     let roleId;
     let roleTitle;
+    let roleSalary;
 
     connection.query('SELECT * FROM role', (err, res) => {
         if (err) throw err;
@@ -705,7 +706,7 @@ const updateRoleMenu = () => {
             }
             res.forEach(({ id, title, salary, department_id }) => {
                 roles.push({id, title, salary, department_id});
-                roleTitles.push(`${id} | ${title}`);
+                roleTitles.push(`${id} | ${title} | $${salary}/yr`);
             });
 
             inquirer.prompt([
@@ -729,14 +730,15 @@ const updateRoleMenu = () => {
             ])
             .then((answers) => {
                 roleId = parseInt(answers.updateRole.split(' ').splice(0));
-                roleTitle = answers.updateRole.split(' ').splice(2);
+                roleTitle = answers.updateRole.split(' ').splice(2, 1);
+                roleSalary = answers.updateRole.split(' ').splice(4, 1);
 
                 switch(answers.updateRoleAction) {
                     case 'Update title':
                         updateRoleTitle(roleId, roleTitle);
                         break;
                     case 'Update salary':
-                        updateRoleSalary(roleId);
+                        updateRoleSalary(roleId, roleSalary);
                         break;
                     case 'Update department':
                         updateRoleDepartment(roleId);
@@ -772,3 +774,27 @@ const updateRoleTitle = (roleId, roleTitle) => {
         });
     });
 };
+
+// Update role salary
+const updateRoleSalary = (roleId, roleSalary) => {
+    inquirer.prompt([
+        {
+            name: 'updateRoleSalary',
+            type: 'input',
+            message: 'New salary:'
+        }
+    ])
+    .then((answer) => {
+        let newSalary = parseInt(answer.updateRoleSalary);
+        connection.query(`UPDATE role SET salary = ${newSalary} WHERE id = ${roleId}`, (err, res) => {
+            if (err) throw err;
+            console.log(`Role (id: ${roleId}) successfully updated!`);
+
+            connection.query(`SELECT salary FROM role WHERE id = ${roleId}`, (err, res) => {
+                if (err) throw err;
+                console.log(`${roleSalary} (previous salary) ---> $${res[0].salary}/yr (updated salary)`)
+                setTimeout(updateMenu, 2000);
+            });
+        });
+    })
+}
