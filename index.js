@@ -487,6 +487,7 @@ const updateEmployeeMenu = () => {
     let employee;
     let employeeRoleId;
     let employeeRole;
+    let managerId;
 
     inquirer.prompt([
         {
@@ -503,6 +504,7 @@ const updateEmployeeMenu = () => {
                 if (err) throw err;
                 employee = res[0].first_name + ' ' + res[0].last_name;
                 employeeRoleId = parseInt(res[0].role_id);
+                managerId = parseInt(res[0].manager_id);
 
                 connection.query(
                     `SELECT * FROM role WHERE id = ${employeeRoleId}`, (err, res) => {
@@ -531,10 +533,10 @@ const updateEmployeeMenu = () => {
                                     updateEmployeeName(employeeId, employee);
                                     break;
                                 case 'Employee role':
-                                    updateEmployeeRole(employeeId, employee, employeeRole, employeeRoleId);
+                                    updateEmployeeRole(employeeId, employee, employeeRole);
                                     break;
                                 case 'Employee manager':
-                                    updateEmployeeManager(employeeId, employee);
+                                    updateEmployeeManager(employeeId, employee, managerId);
                                     break;
                                 case 'All data':
                                     updateEmployeeAll(employeeId, employee);
@@ -582,7 +584,7 @@ const updateEmployeeName = (employeeId, employee) => {
 };
 
 // Update employee role 
-const updateEmployeeRole = (employeeId, employee, employeeRole, employeeRoleId) => {
+const updateEmployeeRole = (employeeId, employee, employeeRole) => {
     roles = [];
     roleTitles = ['No existing roles in database'];
     connection.query(
@@ -621,6 +623,50 @@ const updateEmployeeRole = (employeeId, employee, employeeRole, employeeRoleId) 
                     )
                 });
             });
+        }
+    );
+};
+
+// Update employee manager
+const updateEmployeeManager = (employeeId, employee, managerId) => {
+    employees = [];
+    employeeNames = ['No existing employees in database'];
+    let managerName;
+
+    connection.query(
+        'SELECT * FROM employee', (err, res) => {
+            if (err) throw err;
+            if (res.length > 0) {
+                if (employeeNames[0] === 'No existing employees in database') {
+                    employeeNames.splice(0, 1);
+                }
+                res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
+                    employees.push({id, first_name, last_name, role_id, manager_id});
+                    employeeNames.push(`${id} | ${first_name} ${last_name}`);
+                });
+                employeeNames.push('No manager');
+            }
+
+            connection.query(`SELECT * FROM employee WHERE id = ${managerId}`, (err, res) => {
+                if (err) throw err;
+                managerName = `${res[0].first_name} ${res[0].last_name}`;
+            });
+
+            inquirer.prompt([
+                {
+                    name: 'updateManager',
+                    type: 'list',
+                    message: `Employee's current manager: ${managerName} (id: ${managerId})\nNew manager:`,
+                    choices: employeeNames
+                }
+            ])
+        }
+    );
+
+    connection.query(
+        'UPDATE employee SET manager_id = ? WHERE id = ?', (err, res) => {
+            if (err) throw err;
+            
         }
     );
 };
