@@ -437,3 +437,13 @@ const viewRoles = () => {
         setTimeout(viewMenu, 2000);
     });
 };
+
+// View departments
+const viewDepartments = () => {
+    let query = 'SELECT * FROM department';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        setTimeout(viewMenu, 2000);
+    });
+}
