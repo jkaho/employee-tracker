@@ -270,3 +270,38 @@ const addEmployee = () => {
     );
 };
 
+
+// VIEW EMPLOYEE/ROLE/DEPARTMENT MENU 
+const viewMenu = () => {
+    inquirer.prompt([
+        {
+            name: 'viewAction',
+            type: 'list',
+            message: '----------VIEW MENU----------\nWhat would you like to do?',
+            choices: [
+                'View employees',
+                'View roles',
+                'View departments',
+                'Go back'
+            ]
+        }
+    ])
+    .then((answer) => {
+        // Continue to functions
+        switch(answer.addAction) {
+            case 'Add an employee':
+                viewEmployeeMenu();
+                break;
+            case 'Add a role':
+                viewRoleMenu();
+                break;
+            case 'Add a department':
+                viewDepartmentMenu();
+                break;
+            default:
+                actionMenu();
+                break;
+        }
+    });
+};
+
