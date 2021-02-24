@@ -535,7 +535,6 @@ const updateEmployeeMenu = () => {
                                     'Employee name',
                                     'Employee role',
                                     'Employee manager',
-                                    'All data',
                                     'Go back'
                                 ]
                             }
@@ -689,4 +688,43 @@ const updateEmployeeManager = (employeeId, managerId, managerName) => {
             });
         }
     );
+};
+
+// UPDATE ROLE MENU 
+const updateRoleMenu = () => {
+    let roles = [];
+    let roleTitles = ['No existing roles in database'];
+
+    connection.query('SELECT * FROM role', (err, res) => {
+        if (err) throw err;
+        if (res.length > 0) {
+            if (roleTitles[0] === 'No existing roles in database') {
+                roleTitles.splice(0, 1);
+            }
+            res.forEach(({ id, title, salary, department_id }) => {
+                roles.push({id, title, salary, department_id});
+                roleTitles.push(title);
+            });
+
+            inquirer.prompt([
+                {
+                    name: 'updateRole',
+                    type: 'list',
+                    message: 'Select a role to update:',
+                    choices: roleTitles
+                },
+                {
+                    name: 'updateRoleAction',
+                    type: 'list',
+                    message: 'What would you like to update?',
+                    choices: [
+                        'Update title',
+                        'Update salary',
+                        'Update department',
+                        'Go back to update menu'
+                    ]
+                }
+            ])
+        };
+    });
 };
