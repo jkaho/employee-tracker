@@ -123,26 +123,14 @@ const addRole = () => {
     connection.query(
         'SELECT * FROM department', (err, res) => {
             if (err) throw err;
-            res.forEach(({ id, name }) => {
-                departments.push({id, name});
-            });
             if (departmentNames[0] === 'No existing departments in database') {
                 departmentNames.splice(0, 1);
             }
-            res.forEach((item) => {
-                let departmentNameLower = item.name.toLowerCase();
-                let departmentNameArr = departmentNameLower.split(' ');
-                let departmentNameSentence = '';
-                for (let i = 0; i < departmentNameArr.length; i++) {
-                    let substring = departmentNameArr[i].substring(0, 1).toUpperCase() + departmentNameArr[i].substring(1, departmentNameArr[i].length);
-                    if (i === departmentNameArr.length - 1) {
-                        departmentNameSentence += substring;
-                    } else {
-                        departmentNameSentence += substring + ' ';
-                    }
-                }
-                departmentNames.push(`${item.id} | ${departmentNameSentence}`);
-            })
+            res.forEach(({ id, name }) => {
+                departments.push({id, name});
+                departmentNames.push(`${id} | ${name}`);
+            });
+
             inquirer.prompt([
                 {
                     name: 'roleTitle',
@@ -162,32 +150,18 @@ const addRole = () => {
                 }
             ])
             .then((answers) => {
-                // Format role title answer
-                let roleTitleLower = answers.roleTitle.toLowerCase();
-                let roleTitleArr = roleTitleLower.split(' ');
-                let roleTitleSentence = '';
-                for (let i = 0; i < roleTitleArr.length; i++) {
-                    let substring = roleTitleArr[i].substring(0, 1).toUpperCase() + roleTitleArr[i].substring(1, roleTitleArr[i].length);
-                    if (i === roleTitleArr.length - 1) {
-                        roleTitleSentence += substring;
-                    } else {
-                        roleTitleSentence += substring + ' ';
-                    }
-                }
-
                 let departmentId = '';
                 let splitAnswer = answers.roleDepartment.split(' ');
                 let departmentName = splitAnswer.splice(2).join(' ').trim();
-                let departmentNameLower = departmentName.toLowerCase();
                 for (let i = 0; i < departments.length; i++) {
-                    if (departments[i].name === departmentNameLower) {
+                    if (departments[i].name === departmentName) {
                         departmentId = departments[i].id;
                     }
                 }
                 connection.query(
-                    `INSERT INTO role(title, salary, department_id) VALUES ('${roleTitleLower}', '${answers.roleSalary}', '${departmentId}')`, (err, res) => {
+                    `INSERT INTO role(title, salary, department_id) VALUES ('${answers.roleTitle}', '${answers.roleSalary}', '${departmentId}')`, (err, res) => {
                         if (err) throw err;
-                        console.log(`Role successfully added!\nRole: ${roleTitleSentence}\nSalary: ${answers.roleSalary}\nDepartment: ${departmentName}`);
+                        console.log(`Role successfully added!\nRole: ${answers.roleTitle}\nSalary: ${answers.roleSalary}\nDepartment: ${departmentName}`);
                     }
                 )
             });
