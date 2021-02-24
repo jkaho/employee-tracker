@@ -695,6 +695,7 @@ const updateRoleMenu = () => {
     let roles = [];
     let roleTitles = ['No existing roles in database'];
     let roleId;
+    let roleTitle;
 
     connection.query('SELECT * FROM role', (err, res) => {
         if (err) throw err;
@@ -728,16 +729,17 @@ const updateRoleMenu = () => {
             ])
             .then((answers) => {
                 roleId = parseInt(answers.updateRole.split(' ').splice(0));
+                roleTitle = answers.updateRole.split(' ').splice(2);
 
                 switch(answers.updateRoleAction) {
                     case 'Update title':
-                        updateRoleTitle();
+                        updateRoleTitle(roleId, roleTitle);
                         break;
                     case 'Update salary':
-                        updateRoleSalary();
+                        updateRoleSalary(roleId);
                         break;
                     case 'Update department':
-                        updateRoleDepartment();
+                        updateRoleDepartment(roleId);
                         break;
                     default:
                         updateMenu();
@@ -745,5 +747,28 @@ const updateRoleMenu = () => {
                 };
             });
         };
+    });
+};
+
+// Update role title
+const updateRoleTitle = (roleId, roleTitle) => {
+    inquirer.prompt([
+        {
+            name: 'updateRoleTitle',
+            type: 'input',
+            message: 'New role title:'
+        }
+    ])
+    .then((answer) => {
+        connection.query(`UPDATE role SET title = '${answer.updateRoleTitle}' WHERE id = ${roleId}`, (err, res) => {
+            if (err) throw err;
+            console.log(`Role (id: ${roleId}) title successfully updated!`);
+
+            connection.query(`SELECT * FROM role WHERE id = ${roleId}`, (err, res) => {
+                if (err) throw err;
+                console.log(`${roleTitle} (previous title) ---> ${res[0].title} (updated title)`);
+                setTimeout(updateMenu, 2000);
+            });
+        });
     });
 };
