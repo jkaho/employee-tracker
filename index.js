@@ -347,8 +347,8 @@ const viewEmployeeMenu = () => {
 const viewEmployeeAll = () => {
     query = 'SELECT A.id, A.first_name, A.last_name, role.title AS role, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
-    query += 'JOIN role ON A.role_id = role.id ';
-    query += 'JOIN department ON role.id = department.id ';
+    query += 'LEFT JOIN role ON A.role_id = role.id ';
+    query += 'LEFT JOIN department ON role.id = department.id ';
     query += 'LEFT JOIN employee B ON A.manager_id = B.id';
     connection.query(query, (err, res) => {
             if (err) throw err;
