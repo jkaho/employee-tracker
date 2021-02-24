@@ -38,7 +38,8 @@ const actionMenu = () => {
                 'Add data',
                 'View data',
                 'Update data',
-                'Delete data'
+                'Delete data',
+                'Exit'
             ]
         }
     ])
@@ -56,6 +57,12 @@ const actionMenu = () => {
                 break;
             case 'Delete data':
                 deleteMenu();
+                break;
+            case 'Exit':
+                console.log('Application shutting down...');
+                setTimeout(() => {
+                    connection.end();
+                }, 2000);
                 break;
             default:
                 console.log('Invalid action');
