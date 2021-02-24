@@ -856,22 +856,19 @@ const updateRoleDepartment = (roleId) => {
             }
         ])
         .then((answer) => {
-            if (answer.updateRoleDepartment === 'No existing roles in database') {
-                updateMenu();
-            } else {
-                let departmentId = parseInt(answer.updateRoleDepartment.split(' ').splice(0));
-                let departmentName  = answer.updateRoleDepartment.split(' ').splice(2);
-                connection.query(`UPDATE role SET department_id = ${departmentId} WHERE id = ${roleId}`, (err, res) => {
+            let departmentId = parseInt(answer.updateRoleDepartment.split(' ').splice(0));
+            let departmentName  = answer.updateRoleDepartment.split(' ').splice(2);
+            connection.query(`UPDATE role SET department_id = ${departmentId} WHERE id = ${roleId}`, (err, res) => {
+                if (err) throw err;
+                console.log(`Role (id: ${roleId}) department successfully updated!`);
+                connection.query(`SELECT name FROM department WHERE id = ${departmentId}`, (err, res) => {
                     if (err) throw err;
-                    console.log(`Role (id: ${roleId}) department successfully updated!`);
-                    connection.query(`SELECT name FROM department WHERE id = ${departmentId}`, (err, res) => {
-                        if (err) throw err;
-                        console.log(`${departmentName} (previous department) ---> ${res[0].name} (updated department)`);
+                    console.log(`${departmentName} (previous department) ---> ${res[0].name} (updated department)`);
 
-                        setTimeout(updateMenu, 2000);
-                    });
+                    setTimeout(updateMenu, 2000);
                 });
-            };
+            });
+            
         });
     });
 };
@@ -882,7 +879,18 @@ const updateDepartment = () => {
 
     connection.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;
-        if (res.length > 0) {
+        if (res.length < 1) {
+            inquirer.prompt([
+                {
+                    name: 'noDepartments',
+                    type: 'list',
+                    message: 'There are no existing departments in the database...',
+                    choices: ['Go back to update menu']
+                }
+            ]).then(() => {
+                updateMenu();
+            });
+        } else {
             if (departmentNames[0] === 'No existing departments in database') {
                 departmentNames.splice(0, 1);
             };
@@ -899,29 +907,26 @@ const updateDepartment = () => {
                 }
             ])
             .then((answer) => {
-                if (answer.updateDepartment === 'No existing departments in database') {
-                    updateMenu();
-                } else {
-                    let departmentId = parseInt(answer.updateDepartment.split(' ').splice(0, 1));
-                    let departmentName = answer.updateDepartment.split(' ').splice(2).join(' ').trim();
+                let departmentId = parseInt(answer.updateDepartment.split(' ').splice(0, 1));
+                let departmentName = answer.updateDepartment.split(' ').splice(2).join(' ').trim();
 
-                    inquirer.prompt([
-                        {
-                            name: 'updatedDepartmentName',
-                            type: 'input',
-                            message: 'Update department name:'
-                        }
-                    ])
-                    .then((answer) => {
-                        let updatedDepartmentName = answer.updatedDepartmentName;
+                inquirer.prompt([
+                    {
+                        name: 'updatedDepartmentName',
+                        type: 'input',
+                        message: 'Update department name:'
+                    }
+                ])
+                .then((answer) => {
+                    let updatedDepartmentName = answer.updatedDepartmentName;
 
-                        connection.query(`UPDATE department SET name = '${updatedDepartmentName}' WHERE id = ${departmentId}`, (err, res) => {
-                            if (err) throw err;
-                            console.log(`Department (id: ${departmentId}) name successfully updated!\n${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`);
-                            setTimeout(updateMenu, 2000);
-                        });
+                    connection.query(`UPDATE department SET name = '${updatedDepartmentName}' WHERE id = ${departmentId}`, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Department (id: ${departmentId}) name successfully updated!\n${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`);
+                        setTimeout(updateMenu, 2000);
                     });
-                };
+                });
+                
             });
         };
     });
