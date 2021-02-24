@@ -708,47 +708,54 @@ const updateRoleMenu = () => {
                 roles.push({id, title, salary, department_id});
                 roleTitles.push(`${id} | ${title} | $${salary}/yr`);
             });
-
-            inquirer.prompt([
-                {
-                    name: 'updateRole',
-                    type: 'list',
-                    message: 'Select a role to update:',
-                    choices: roleTitles
-                },
-                {
-                    name: 'updateRoleAction',
-                    type: 'list',
-                    message: 'What would you like to update?',
-                    choices: [
-                        'Update title',
-                        'Update salary',
-                        'Update department',
-                        'Go back to update menu'
-                    ]
-                }
-            ])
-            .then((answers) => {
-                roleId = parseInt(answers.updateRole.split(' ').splice(0));
-                roleTitle = answers.updateRole.split(' ').splice(2, 1);
-                roleSalary = answers.updateRole.split(' ').splice(4, 1);
-
-                switch(answers.updateRoleAction) {
-                    case 'Update title':
-                        updateRoleTitle(roleId, roleTitle);
-                        break;
-                    case 'Update salary':
-                        updateRoleSalary(roleId, roleSalary);
-                        break;
-                    case 'Update department':
-                        updateRoleDepartment(roleId);
-                        break;
-                    default:
-                        updateMenu();
-                        break;
-                };
-            });
         };
+
+        inquirer.prompt([
+            {
+                name: 'updateRole',
+                type: 'list',
+                message: 'Select a role to update:',
+                choices: roleTitles
+            }
+        ])
+        .then((answer) => {
+            if (answer.updateRole === 'No existing roles in database') {
+                updateMenu();
+            } else {
+                roleId = parseInt(answer.updateRole.split(' ').splice(0));
+                roleTitle = answer.updateRole.split(' ').splice(2, 1);
+                roleSalary = answer.updateRole.split(' ').splice(4, 1);
+                
+                inquirer.prompt([
+                    {
+                        name: 'updateRoleAction',
+                        type: 'list',
+                        message: 'What would you like to update?',
+                        choices: [
+                            'Update title',
+                            'Update salary',
+                            'Update department',
+                            'Go back to update menu'
+                        ]
+                    }
+                ]).then((answer) => {
+                    switch(answer.updateRoleAction) {
+                        case 'Update title':
+                            updateRoleTitle(roleId, roleTitle);
+                            break;
+                        case 'Update salary':
+                            updateRoleSalary(roleId, roleSalary);
+                            break;
+                        case 'Update department':
+                            updateRoleDepartment(roleId);
+                            break;
+                        default:
+                            updateMenu();
+                            break;
+                    };
+                });
+            };            
+        });
     });
 };
 
