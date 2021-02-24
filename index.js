@@ -128,6 +128,9 @@ const addDepartment = () => {
 
 // Function for adding a role
 const addRole = () => {
+    departments = [];
+    departmentNames = ['No existing departments in database'];
+
     connection.query(
         'SELECT * FROM department', (err, res) => {
             if (err) throw err;
@@ -188,6 +191,11 @@ const addRole = () => {
 
 // Function for adding an employee
 const addEmployee = () => {
+    roles = [];
+    roleTitles = ['No existing roles in database'];
+    employees = [];
+    employeeNames = ['No existing employees in database'];
+    
     connection.query(
         'SELECT * FROM role', (err, res) => {
             if (err) throw err;
