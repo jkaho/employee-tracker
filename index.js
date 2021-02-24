@@ -195,7 +195,7 @@ const addEmployee = () => {
     roleTitles = ['No existing roles in database'];
     employees = [];
     employeeNames = ['No existing employees in database'];
-    
+
     connection.query(
         'SELECT * FROM role', (err, res) => {
             if (err) throw err;
@@ -329,7 +329,7 @@ const viewMenu = () => {
     });
 };
 
-// View employees menu
+// VIEW EMPLOYEES MENU
 const viewEmployeeMenu = () => {
     inquirer.prompt([
         {
@@ -368,6 +368,7 @@ const viewEmployeeMenu = () => {
     });
 };
 
+// View all employee information 
 const viewEmployeeAll = () => {
     query = 'SELECT A.id, A.first_name, A.last_name, role.title AS role, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
@@ -377,6 +378,7 @@ const viewEmployeeAll = () => {
     connection.query(query, (err, res) => {
             if (err) throw err;
             console.table(res)
+            setTimeout(viewMenu, 2000);
         }
     );
 };
