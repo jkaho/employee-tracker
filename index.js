@@ -494,8 +494,10 @@ const updateEmployeeMenu = () => {
         }
     ])
     .then((answer) => {
+        let employeeId = parseInt(answer.employeeId);
+        
         connection.query(
-            `SELECT first_name, last_name FROM employee WHERE id = ${answer.employeeId}`, (err, res) => {
+            `SELECT first_name, last_name FROM employee WHERE id = ${employeeId}`, (err, res) => {
                 if (err) throw err;
                 employee = res[0].first_name + ' ' + res[0].last_name;
 
@@ -517,7 +519,7 @@ const updateEmployeeMenu = () => {
                     // Continue to functions
                     switch(answer.updateEmployee) {
                         case 'Employee name':
-                            updateEmployeeName(parseInt(answer.employeeId));
+                            updateEmployeeName(employeeId, employee);
                             break;
                         case 'Employee role':
                             updateEmployeeRole();
@@ -539,23 +541,31 @@ const updateEmployeeMenu = () => {
 };
 
 // Update employee name 
-const updateEmployeeName = (employeeId) => {
+const updateEmployeeName = (employeeId, employee) => {
     inquirer.prompt([
         {
-            name: 'newEmployeeFirst',
+            name: 'updateFirstName',
             type: 'input',
             message: 'Update first name:',
         },
         {
-            name: 'newEmployeeLast',
+            name: 'updateLastName',
             type: 'input',
             message: 'Update last name:',
         }
     ])
-    let query = 'UPDATE employee ';
-    query += 'SET first_name = ?'
-    connection.query(query, (err, res) => {
-        if (err) throw err;
-        console.table(res);
+    .then((answers) => {
+        let query = 'UPDATE employee ';
+        query += 'SET first_name = ?, last_name = ? WHERE id = ?'
+        connection.query(query, [answers.updateFirstName, answers.updateLastName, employeeId], (err, res) => {
+            if (err) throw err;
+            console.log(`Employee (id: ${employeeId}) name successfully updated!`);
+            connection.query(
+                `SELECT * FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                    if (err) throw err;
+                    console.log(`${employee} (previous) ----> ${res[0].first_name} ${res[0].last_name} (updated)\n`);
+                }
+            )
+        });
     });
 };
