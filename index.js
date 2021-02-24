@@ -911,6 +911,7 @@ const deleteMenu = () => {
                 'Delete an employee',
                 'Delete a role',
                 'Delete a department',
+                'Delete ALL data',
                 'Go back'
             ]
         }
@@ -926,6 +927,9 @@ const deleteMenu = () => {
                 break;
             case 'Delete a department':
                 deleteDepartment();
+                break;
+            case 'Delete ALL data':
+                deleteALLData();
                 break;
             default:
                 actionMenu();
@@ -1144,5 +1148,56 @@ const deleteDepartment = () => {
                 setTimeout(deleteMenu, 2000);
             });
         });
+    });
+};
+
+// Delete ALL data from database 
+const deleteALLData = () => {
+    inquirer.prompt([
+        {
+            name: 'deleteConfirmOne',
+            type: 'confirm',
+            message: 'If you proceed, ALL records (employees, roles & departments) will be deleted. Are you sure you want to continue?'
+        }
+    ]).then((answer) => {
+        if (answer.deleteConfirmOne === false) {
+            console.log('Action cancelled. Returning to delete menu...');
+            setTimeout(deleteMenu, 2000);
+        } else {
+            inquirer.prompt([
+                {
+                    name: 'deleteConfirmTwo', 
+                    type: 'confirm',
+                    message: 'Final warning. ALL your data will be erased, never to be retrieved again. Continue?'
+                }
+            ]).then((answer) => {
+                if (answer.deleteConfirmTwo === false) {
+                    console.log('Action cancelled. Returning to delete menu...');
+                    setTimeout(deleteMenu, 2000);
+                } else {
+                    inquirer.prompt([
+                        {
+                            name: 'deleteValidation',
+                            type: 'input',
+                            message: `To delete all data records, enter 'I really do want to delete everything':`
+                        }
+                    ]).then((answer) => {
+                        if (answer.deleteValidation === 'I really do want to delete everything') {
+                            connection.query('DELETE FROM employee', (err, res) => {
+                                if (err) throw err;
+                                connection.query('DELETE FROM role', (err, res) => {
+                                    if (err) throw err;
+                                    connection.query('DELETE FROM department', (err, res) => {
+                                        if (err) throw err;
+                                        console.log('All data records successfully deleted.');
+                                        setTimeout(deleteMenu, 2000); 
+                                    });
+                                });
+                            });
+                        };
+                    });
+                };
+            });
+        };
     });
 };
