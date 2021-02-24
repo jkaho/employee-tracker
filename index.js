@@ -552,9 +552,6 @@ const updateEmployeeMenu = () => {
                                 case 'Employee manager':
                                     updateEmployeeManager(employeeId, managerId, managerName);
                                     break;
-                                case 'All data':
-                                    updateEmployeeAll(employeeId, employee);
-                                    break;
                                 default:
                                     updateMenu();
                                     break;
