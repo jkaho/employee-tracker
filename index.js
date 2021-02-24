@@ -958,8 +958,7 @@ const deleteEmployee = () => {
                     message: 'There are no existing employees in the database...',
                     choices: ['Go back to delete menu']
                 }
-            ])
-            .then(deleteMenu());
+            ]).then(deleteMenu());
         };
 
         inquirer.prompt([
@@ -1052,5 +1051,53 @@ const deleteEmployee = () => {
                     break;
             };
         });
+    });
+};
+
+// Delete a role 
+const deleteRole = () => {
+    roleTitles = ['No existing roles in database'];
+
+    let query = 'SELECT role.id, role.title, role.salary, department.name ';
+    query += 'FROM role ';
+    query += 'JOIN department ON role.department_id = department.id';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        if (res.length > 0) {
+            if (roleTitles[0] === 'No existing roles in database') {
+                roleTitles.splice(0, 1);
+            };
+            res.forEach((item) => {
+                roleTitles.push(`${item.id} | ${item.title} | ${item.salary} | ${item.name}`);
+            });
+        } else {
+            inquirer.prompt([
+                {
+                    name: 'noRoles',
+                    type: 'list',
+                    message: 'There are no existing roles in the database...',
+                    choices: ['Go back to delete menu']
+                }
+            ]).then(deleteMenu());
+        };
+
+        inquirer.prompt([
+            {
+                name: 'deleteRole',
+                type: 'list',
+                message: 'Select a role to delete:',
+                choices: roleTitles
+            }
+        ])
+        .then((answer) => {
+            let roleId = parseInt(answer.deleteRole.split(' ').splice(0, 1));
+            let roleName = answer.deleteRole.split(' ').slice(2, answer.deleteRole.split(' ').length - 4).join(' ').trim();
+
+            connection.query(`DELETE FROM role WHERE id = ${roleId}`, (err, res) => {
+                if (err) throw err;
+                console.log(`Role ('${roleName}', id: ${roleId}) successfully deleted.`);
+                setTimeout(deleteMenu, 2000);
+            });
+        })
     });
 };
