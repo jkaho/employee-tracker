@@ -305,3 +305,40 @@ const viewMenu = () => {
     });
 };
 
+// View employees menu
+const viewEmployeeMenu = () => {
+    inquirer.prompt([
+        {
+            name: 'viewEmployees',
+            type: 'list',
+            message: '----------VIEW EMPLOYEES----------\nHow would you like to view employees?',
+            choices: [
+                'View all',
+                'View by role',
+                'View by department',
+                'View by manager',
+                'Go back'
+            ]
+        }
+    ])
+    .then((answer) => {
+        // Continue to functions
+        switch(answer.addAction) {
+            case 'View all':
+                viewEmployeeAll();
+                break;
+            case 'View by role':
+                viewEmployeeByRole();
+                break;
+            case 'View by department':
+                viewEmployeeByDepartment();
+                break;
+            case 'View by manager':
+                viewEmployeeByManager();
+                break;
+            default:
+                viewMenu();
+                break;
+        }
+    });
+};
