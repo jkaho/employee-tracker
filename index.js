@@ -2,6 +2,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+const { connect } = require('http2');
 
 // Database components
 let departments = [];
@@ -930,5 +931,87 @@ const deleteMenu = () => {
                 actionMenu();
                 break;
         };
+    });
+};
+
+// Delete an employee
+const deleteEmployee = () => {
+    employeeNames = ['No existing employees in database'];
+    let query = 'SELECT employee.id, employee.first_name, employee.last_name, department.name ';
+    query += 'FROM employee ';
+    query += 'JOIN role ON employee.role_id = role.id ';
+    query += 'JOIN department ON role.department_id = department.id';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        if (res.length > 0) {
+            if (employeeNames[0] === 'No existing employees in database') {
+                employeeNames.splice(0, 1);
+            };
+            res.forEach((item) => {
+                employeeNames.push(`${item.id} | ${item.first_name} ${item.last_name} | ${item.name}`)
+            });
+        } else {
+            inquirer.prompt([
+                {
+                    name: 'noEmployees',
+                    type: 'list',
+                    message: 'There are no existing employees in the database...',
+                    choices: ['Go back to delete menu']
+                }
+            ])
+            .then(deleteMenu());
+        };
+
+        inquirer.prompt([
+            {
+                name: 'inputOrView',
+                type: 'list',
+                message: 'Select one of the following:',
+                choices: [
+                    'Find employee by id',
+                    'View all employees'
+                ]
+            }
+        ])
+        .then((answer) => {
+            switch(answer.inputOrView) {
+                case 'Find employee by id':
+                    inquirer.prompt([
+                        {
+                            name: 'employeeId',
+                            type: 'input',
+                            message: 'Employee id:'
+                        }
+                    ])
+                    .then((answer) => {
+                        let employeeId = parseInt(answer.employeeId);
+                        connection.query(`SELECT first_name, last_name FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                            if (err) throw err;
+                            if (res.length < 1) {
+                                console.log(`Sorry! No employees with the id ${employeeId} found in the database.`);
+                                setTimeout(deleteMenu, 2000);
+                            } else {
+                                let name = `${res[0].first_name} ${res[0].last_name}`;
+                                inquirer.prompt([
+                                    {
+                                        name: 'confirmation',
+                                        type: 'confirm',
+                                        message: `Are you sure you want to delete employee '${name}' (id: ${employeeId})?` 
+                                    }
+                                ])
+                                .then((answer) => {
+                                    if (answer.confirmation === true) {
+                                        connection.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                                            if (err) throw err;
+                                            console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
+                                            setTimeout(deleteMenu, 2000);
+                                        });
+                                    };
+                                });
+                            };
+                        });
+                    });
+            };
+        });
     });
 };
