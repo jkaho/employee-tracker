@@ -174,27 +174,14 @@ const addEmployee = () => {
     connection.query(
         'SELECT * FROM role', (err, res) => {
             if (err) throw err;
-            res.forEach(({ id, title, salary, department_id }) => {
-                roles.push({id, title, salary, department_id});
-            });
             if (roleTitles[0] === 'No existing roles in database') {
                 roleTitles.splice(0, 1);
             }
-            // Format role titles for prompt
-            res.forEach((item) => {
-                let roleTitleArr = item.title.split(' ');
-                let roleTitleSentence = '';
+            res.forEach(({ id, title, salary, department_id }) => {
+                roles.push({id, title, salary, department_id});
+                roleTitles.push(title);
+            });
 
-                for (let i = 0; i < roleTitleArr.length; i++) {
-                    let substring = roleTitleArr[i].substring(0, 1).toUpperCase() + roleTitleArr[i].substring(1, roleTitleArr[i].length);
-                    if (i === roleTitleArr.length - 1) {
-                        roleTitleSentence += substring;
-                    } else {
-                        roleTitleSentence += substring + ' ';
-                    }
-                }
-                roleTitles.push(roleTitleSentence);
-            })
             inquirer.prompt([
                 {
                     name: 'employeeFirstName',
@@ -219,43 +206,22 @@ const addEmployee = () => {
                 let employeeRole = answers.employeeRole;
                 let roleId = '';
                 for (let i = 0; i < roles.length; i++) {
-                    if (roles[i].title === answers.employeeRole.toLowerCase()) {
+                    if (roles[i].title === answers.employeeRole) {
                         roleId = roles[i].id;
                     }
                 }
                 connection.query(
                     'SELECT * FROM employee', (err, res) => {
                         if (err) throw err;
-                        res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
-                            employees.push({id, first_name, last_name, role_id, manager_id});
-                        });
                         if (employeeNames[0] === 'No existing employees in database') {
                             employeeNames.splice(0, 1);
                         }
-                        res.forEach((item) => {
-                            let employeeFirstNameArr = item.first_name.split(' ');
-                            let employeeLastNameArr = item.last_name.split(' ');
-                            let employeeFirstNameCap = '';
-                            let employeeLastNameCap = '';
-            
-                            for (let i = 0; i < employeeFirstNameArr.length; i++) {
-                                let substring = employeeFirstNameArr[i].substring(0, 1).toUpperCase() + employeeFirstNameArr[i].substring(1, employeeFirstNameArr[i].length);
-                                if (i === employeeFirstNameArr.length - 1) {
-                                    employeeFirstNameCap += substring;
-                                } else {
-                                    employeeFirstNameCap += substring + ' ';
-                                }
-                            }
-                            for (let i = 0; i < employeeLastNameArr.length; i++) {
-                                let substring = employeeLastNameArr[i].substring(0, 1).toUpperCase() + employeeLastNameArr[i].substring(1, employeeLastNameArr[i].length);
-                                if (i === employeeLastNameArr.length - 1) {
-                                    employeeLastNameCap += substring;
-                                } else {
-                                    employeeLastNameCap += substring + ' ';
-                                }
-                            }
-                            employeeNames.push(`${item.id} | ${employeeFirstNameCap} ${employeeLastNameCap}`);
+                        res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
+                            employees.push({id, first_name, last_name, role_id, manager_id});
+                            employeeNames.push(`${id} | ${first_name} ${last_name}`);
                         });
+                        employeeNames.push('No manager');
+
                         inquirer.prompt([
                             {
                                 name: 'employeeManager',
@@ -268,13 +234,13 @@ const addEmployee = () => {
                             let managerId = '';
                             let splitAnswer = answer.employeeManager.split(' ');
                             let managerName = '';                      
-                            if (answer.employeeManager === 'No existing employees in database') {
+                            if (answer.employeeManager === 'No existing employees in database' || answer.employeeManager == 'No manager') {
                                 managerId = null;
                                 managerName = 'No existing managers'
                             } else {
-                                managerName = splitAnswer.splice(0, 2).join(' ');  
+                                managerName = splitAnswer.splice(2, splitAnswer.length).join(' ');  
                                 for (let i = 0; i < employees.length; i++) {
-                                    if (employees[i].id === parseInt(splitAnswer[0])) {
+                                    if (employees[i].id === parseInt(answer.employeeManager.split(' ')[0])) {
                                         managerId = employees[i].id;
                                     }
                                 }
@@ -288,9 +254,9 @@ const addEmployee = () => {
                             })
                         });
                     }
-                )
-            })
+                );
+            });
         }
-    )
-}
+    );
+};
 
