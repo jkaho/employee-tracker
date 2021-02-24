@@ -488,6 +488,7 @@ const updateEmployeeMenu = () => {
     let employeeRoleId;
     let employeeRole;
     let managerId;
+    let managerName;
 
     inquirer.prompt([
         {
@@ -504,12 +505,25 @@ const updateEmployeeMenu = () => {
                 if (err) throw err;
                 employee = res[0].first_name + ' ' + res[0].last_name;
                 employeeRoleId = parseInt(res[0].role_id);
-                managerId = parseInt(res[0].manager_id);
+                if (res[0].manager_id !== null) {
+                    managerId = parseInt(res[0].manager_id);
+                } else {
+                    managerId = null;
+                }
+
+                if (typeof(managerId) === "object") {
+                    managerName = 'No manager';
+                    managerId = 'N/A';
+                } else {
+                    connection.query(`SELECT * FROM employee WHERE id = ${managerId}`, (err, res) => {
+                        if (err) throw err;
+                        managerName = res[0].first_name + ' ' + res[0].last_name;
+                    });  
+                };
 
                 connection.query(
                     `SELECT * FROM role WHERE id = ${employeeRoleId}`, (err, res) => {
                         if (err) throw err;
-                        console.log(res)
                         employeeRole = res[0].title;
 
                         inquirer.prompt([
@@ -536,7 +550,7 @@ const updateEmployeeMenu = () => {
                                     updateEmployeeRole(employeeId, employee, employeeRole);
                                     break;
                                 case 'Employee manager':
-                                    updateEmployeeManager(employeeId, employee, managerId);
+                                    updateEmployeeManager(employeeId, managerId, managerName);
                                     break;
                                 case 'All data':
                                     updateEmployeeAll(employeeId, employee);
@@ -576,7 +590,7 @@ const updateEmployeeName = (employeeId, employee) => {
             connection.query(
                 `SELECT * FROM employee WHERE id = ${employeeId}`, (err, res) => {
                     if (err) throw err;
-                    console.log(`${employee} (previous name) ----> ${res[0].first_name} ${res[0].last_name} (updated name)\n`);
+                    console.log(`${employee} (previous name) ---> ${res[0].first_name} ${res[0].last_name} (updated name)\n`);
                 }
             )
         });
@@ -618,7 +632,7 @@ const updateEmployeeRole = (employeeId, employee, employeeRole) => {
                     connection.query(
                         `SELECT * FROM role WHERE id = ${roleId}`, (err, res) => {
                             if (err) throw err;
-                            console.log(`${employeeRole} (previous role) ----> ${res[0].title} (updated role)\n`);
+                            console.log(`${employeeRole} (previous role) ---> ${res[0].title} (updated role)\n`);
                         }
                     )
                 });
@@ -628,10 +642,9 @@ const updateEmployeeRole = (employeeId, employee, employeeRole) => {
 };
 
 // Update employee manager
-const updateEmployeeManager = (employeeId, employee, managerId) => {
+const updateEmployeeManager = (employeeId, managerId, managerName) => {
     employees = [];
     employeeNames = ['No existing employees in database'];
-    let managerName;
 
     connection.query(
         'SELECT * FROM employee', (err, res) => {
@@ -647,11 +660,6 @@ const updateEmployeeManager = (employeeId, employee, managerId) => {
                 employeeNames.push('No manager');
             }
 
-            connection.query(`SELECT * FROM employee WHERE id = ${managerId}`, (err, res) => {
-                if (err) throw err;
-                managerName = `${res[0].first_name} ${res[0].last_name}`;
-            });
-
             inquirer.prompt([
                 {
                     name: 'updateManager',
@@ -660,13 +668,28 @@ const updateEmployeeManager = (employeeId, employee, managerId) => {
                     choices: employeeNames
                 }
             ])
-        }
-    );
+            .then((answer) => {
+                let newManagerId;
+                if (answer.updateManager === 'No manager') {
+                    newManagerId = null;
+                } else {
+                    newManagerId = parseInt(answer.updateManager.split(' ').splice(0, 1));
+                }
+                connection.query(
+                    'UPDATE employee SET manager_id = ? WHERE id = ?', [newManagerId, employeeId], (err, res) => {
+                        if (err) throw err;
+                        console.log(`Employee manager successfully updated!`);
 
-    connection.query(
-        'UPDATE employee SET manager_id = ? WHERE id = ?', (err, res) => {
-            if (err) throw err;
-            
+                        if (newManagerId !== null) {
+                            console.log(`${managerName} (previous manager) ---> ${answer.updateManager.split(2)} (updated manager)\n`);
+                        } else {
+                            console.log(`${managerName} (previous manager) ---> No manager (updated manager)\n`);
+                        }
+
+                        setTimeout(updateMenu, 2000);
+                    }
+                );
+            });
         }
     );
 };
