@@ -1101,3 +1101,48 @@ const deleteRole = () => {
         })
     });
 };
+
+// Delete a department 
+const deleteDepartment = () => {
+    departmentNames = ['No existing departments in database'];
+
+    connection.query('SELECT * FROM department', (err, res) => {
+        if (err) throw err;
+        if (res.length > 0) {
+            if (departmentNames[0] === 'No existing departments in database') {
+                departmentNames.splice(0, 1);
+            };
+            res.forEach((item) => {
+                departmentNames.push(`${item.id} | ${item.name}`);
+            });
+        } else {
+            inquirer.prompt([
+                {
+                    name: 'noDepartments',
+                    type: 'list',
+                    message: 'There are no existing departments in the database...',
+                    choices: ['Go back to delete menu']
+                }
+            ]).then(deleteMenu());
+        };
+
+        inquirer.prompt([
+            {
+                name: 'deleteDepartment',
+                type: 'list',
+                message: 'Select a department to delete:',
+                choices: departmentNames
+            }
+        ])
+        .then((answer) => {
+            let departmentId = parseInt(answer.deleteDepartment.split(' ').splice(0, 1));
+            let departmentName = answer.deleteDepartment.split(' ').slice(2).join(' ').trim();
+
+            connection.query(`DELETE FROM department WHERE id = ${departmentId}`, (err, res) => {
+                if (err) throw err;
+                console.log(`Department ('${departmentName}', id: ${departmentId}) successfully deleted.`);
+                setTimeout(deleteMenu, 2000);
+            });
+        });
+    });
+};
