@@ -694,6 +694,7 @@ const updateEmployeeManager = (employeeId, managerId, managerName) => {
 const updateRoleMenu = () => {
     let roles = [];
     let roleTitles = ['No existing roles in database'];
+    let roleId;
 
     connection.query('SELECT * FROM role', (err, res) => {
         if (err) throw err;
@@ -703,7 +704,7 @@ const updateRoleMenu = () => {
             }
             res.forEach(({ id, title, salary, department_id }) => {
                 roles.push({id, title, salary, department_id});
-                roleTitles.push(title);
+                roleTitles.push(`${id} | ${title}`);
             });
 
             inquirer.prompt([
@@ -725,6 +726,24 @@ const updateRoleMenu = () => {
                     ]
                 }
             ])
+            .then((answers) => {
+                roleId = parseInt(answers.updateRole.split(' ').splice(0));
+
+                switch(answers.updateRoleAction) {
+                    case 'Update title':
+                        updateRoleTitle();
+                        break;
+                    case 'Update salary':
+                        updateRoleSalary();
+                        break;
+                    case 'Update department':
+                        updateRoleDepartment();
+                        break;
+                    default:
+                        updateMenu();
+                        break;
+                };
+            });
         };
     });
 };
