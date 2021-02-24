@@ -412,3 +412,18 @@ const viewEmployeeByDepartment = () => {
         setTimeout(viewMenu, 2000);
     });
 };
+
+// View employee data by manager
+const viewEmployeeByManager = () => {
+    query = 'SELECT B.id AS manager_id, B.first_name AS manager_first, B.last_name AS manager_last, A.id AS employee_id, A.first_name AS employee_first, A.last_name AS employee_last, role.title AS role, role.salary, department.name AS department ';
+    query += 'FROM employee A ';
+    query += 'LEFT JOIN role ON A.role_id = role.id ';
+    query += 'LEFT JOIN department ON role.id = department.id ';
+    query += 'JOIN employee B ON A.manager_id = B.id ';
+    query += 'ORDER BY A.manager_id';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        setTimeout(viewMenu, 2000);
+    });
+};
