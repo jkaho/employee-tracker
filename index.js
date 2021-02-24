@@ -288,14 +288,14 @@ const viewMenu = () => {
     ])
     .then((answer) => {
         // Continue to functions
-        switch(answer.addAction) {
-            case 'Add an employee':
+        switch(answer.viewAction) {
+            case 'View employees':
                 viewEmployeeMenu();
                 break;
-            case 'Add a role':
+            case 'View roles':
                 viewRoleMenu();
                 break;
-            case 'Add a department':
+            case 'View departments':
                 viewDepartmentMenu();
                 break;
             default:
@@ -323,7 +323,8 @@ const viewEmployeeMenu = () => {
     ])
     .then((answer) => {
         // Continue to functions
-        switch(answer.addAction) {
+        console.log(answer.viewEmployees)
+        switch(answer.viewEmployees) {
             case 'View all':
                 viewEmployeeAll();
                 break;
@@ -341,4 +342,17 @@ const viewEmployeeMenu = () => {
                 break;
         }
     });
+};
+
+const viewEmployeeAll = () => {
+    query = 'SELECT A.id, A.first_name, A.last_name, role.title AS role, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
+    query += 'FROM employee A ';
+    query += 'JOIN role ON A.role_id = role.id ';
+    query += 'JOIN department ON role.id = department.id ';
+    query += 'LEFT JOIN employee B ON A.manager_id = B.id';
+    connection.query(query, (err, res) => {
+            if (err) throw err;
+            console.table(res)
+        }
+    );
 };
