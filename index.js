@@ -484,43 +484,78 @@ const updateMenu = () => {
 
 // UPDATE EMPLOYEE MENU 
 const updateEmployeeMenu = () => {
+    let employee;
+
     inquirer.prompt([
         {
-            name: 'employeeName',
+            name: 'employeeId',
             type: 'input',
             message: 'What is the id of the employee you would like to update?',
-        },
-        {
-            name: 'updateEmployee',
-            type: 'list',
-            message: '----------UPDATE EMPLOYEE MENU----------\nWhat data would you like to update?',
-            choices: [
-                'Employee name',
-                'Employee role',
-                'Employee manager',
-                'All data',
-                'Go back'
-            ]
         }
     ])
     .then((answer) => {
-        // Continue to functions
-        switch(answer.updateEmployee) {
-            case 'Employee name':
-                updateEmployeeName();
-                break;
-            case 'Employee role':
-                updateEmployeeRole();
-                break;
-            case 'Employee manager':
-                updateEmployeeManager();
-                break;
-            case 'All data':
-                updateEmployeeAll();
-                break;
-            default:
-                updateMenu();
-                break;
+        connection.query(
+            `SELECT first_name, last_name FROM employee WHERE id = ${answer.employeeId}`, (err, res) => {
+                if (err) throw err;
+                employee = res[0].first_name + ' ' + res[0].last_name;
+
+                inquirer.prompt([
+                    {
+                        name: 'updateEmployee',
+                        type: 'list',
+                        message: `----------UPDATE EMPLOYEE MENU (${employee})----------\nWhat data would you like to update?`,
+                        choices: [
+                            'Employee name',
+                            'Employee role',
+                            'Employee manager',
+                            'All data',
+                            'Go back'
+                        ]
+                    }
+                ])
+                .then((answer) => {
+                    // Continue to functions
+                    switch(answer.updateEmployee) {
+                        case 'Employee name':
+                            updateEmployeeName(parseInt(answer.employeeId));
+                            break;
+                        case 'Employee role':
+                            updateEmployeeRole();
+                            break;
+                        case 'Employee manager':
+                            updateEmployeeManager();
+                            break;
+                        case 'All data':
+                            updateEmployeeAll();
+                            break;
+                        default:
+                            updateMenu();
+                            break;
+                    }
+                });
+            }
+        );
+    });
+};
+
+// Update employee name 
+const updateEmployeeName = (employeeId) => {
+    inquirer.prompt([
+        {
+            name: 'newEmployeeFirst',
+            type: 'input',
+            message: 'Update first name:',
+        },
+        {
+            name: 'newEmployeeLast',
+            type: 'input',
+            message: 'Update last name:',
         }
+    ])
+    let query = 'UPDATE employee ';
+    query += 'SET first_name = ?'
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
     });
 };
