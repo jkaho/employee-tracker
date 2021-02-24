@@ -491,76 +491,92 @@ const updateEmployeeMenu = () => {
     let managerId;
     let managerName;
 
-    inquirer.prompt([
-        {
-            name: 'employeeId',
-            type: 'input',
-            message: 'What is the id of the employee you would like to update?',
-        }
-    ])
-    .then((answer) => {
-        let employeeId = parseInt(answer.employeeId);
-        
-        connection.query(
-            `SELECT * FROM employee WHERE id = ${employeeId}`, (err, res) => {
-                if (err) throw err;
-                employee = res[0].first_name + ' ' + res[0].last_name;
-                employeeRoleId = parseInt(res[0].role_id);
-                if (res[0].manager_id !== null) {
-                    managerId = parseInt(res[0].manager_id);
-                } else {
-                    managerId = null;
+    connection.query('SELECT * FROM employee', (err, res) => {
+        if (err) throw err;
+        if (res.length < 1) {
+            inquirer.prompt([
+                {
+                    name: 'noEmployees',
+                    type: 'list',
+                    message: 'There are no existing employees in the database...',
+                    choices: ['Go back to update menu']
                 }
-
-                if (typeof(managerId) === "object") {
-                    managerName = 'No manager';
-                    managerId = 'N/A';
-                } else {
-                    connection.query(`SELECT * FROM employee WHERE id = ${managerId}`, (err, res) => {
-                        if (err) throw err;
-                        managerName = res[0].first_name + ' ' + res[0].last_name;
-                    });  
-                };
-
+            ]).then(() => {
+                updateMenu();
+            });
+        } else {
+            inquirer.prompt([
+                {
+                    name: 'employeeId',
+                    type: 'input',
+                    message: 'What is the id of the employee you would like to update?',
+                }
+            ])
+            .then((answer) => {
+                let employeeId = parseInt(answer.employeeId);
+                
                 connection.query(
-                    `SELECT * FROM role WHERE id = ${employeeRoleId}`, (err, res) => {
+                    `SELECT * FROM employee WHERE id = ${employeeId}`, (err, res) => {
                         if (err) throw err;
-                        employeeRole = res[0].title;
-
-                        inquirer.prompt([
-                            {
-                                name: 'updateEmployee',
-                                type: 'list',
-                                message: `----------UPDATE EMPLOYEE MENU (${employee}, ${employeeRole})----------\nWhat data would you like to update?`,
-                                choices: [
-                                    'Employee name',
-                                    'Employee role',
-                                    'Employee manager',
-                                    'Go back'
-                                ]
+                        employee = res[0].first_name + ' ' + res[0].last_name;
+                        employeeRoleId = parseInt(res[0].role_id);
+                        if (res[0].manager_id !== null) {
+                            managerId = parseInt(res[0].manager_id);
+                        } else {
+                            managerId = null;
+                        }
+        
+                        if (typeof(managerId) === "object") {
+                            managerName = 'No manager';
+                            managerId = 'N/A';
+                        } else {
+                            connection.query(`SELECT * FROM employee WHERE id = ${managerId}`, (err, res) => {
+                                if (err) throw err;
+                                managerName = res[0].first_name + ' ' + res[0].last_name;
+                            });  
+                        };
+        
+                        connection.query(
+                            `SELECT * FROM role WHERE id = ${employeeRoleId}`, (err, res) => {
+                                if (err) throw err;
+                                employeeRole = res[0].title;
+        
+                                inquirer.prompt([
+                                    {
+                                        name: 'updateEmployee',
+                                        type: 'list',
+                                        message: `----------UPDATE EMPLOYEE MENU (${employee}, ${employeeRole})----------\nWhat data would you like to update?`,
+                                        choices: [
+                                            'Employee name',
+                                            'Employee role',
+                                            'Employee manager',
+                                            'Go back'
+                                        ]
+                                    }
+                                ])
+                                .then((answer) => {
+                                    // Continue to functions
+                                    switch(answer.updateEmployee) {
+                                        case 'Employee name':
+                                            updateEmployeeName(employeeId, employee);
+                                            break;
+                                        case 'Employee role':
+                                            updateEmployeeRole(employeeId, employee, employeeRole);
+                                            break;
+                                        case 'Employee manager':
+                                            updateEmployeeManager(employeeId, managerId, managerName);
+                                            break;
+                                        default:
+                                            updateMenu();
+                                            break;
+                                    };
+                                });
                             }
-                        ])
-                        .then((answer) => {
-                            // Continue to functions
-                            switch(answer.updateEmployee) {
-                                case 'Employee name':
-                                    updateEmployeeName(employeeId, employee);
-                                    break;
-                                case 'Employee role':
-                                    updateEmployeeRole(employeeId, employee, employeeRole);
-                                    break;
-                                case 'Employee manager':
-                                    updateEmployeeManager(employeeId, managerId, managerName);
-                                    break;
-                                default:
-                                    updateMenu();
-                                    break;
-                            }
-                        });
+                        );
                     }
                 );
-            }
-        );
+            });
+        }
     });
 };
 
@@ -701,7 +717,18 @@ const updateRoleMenu = () => {
 
     connection.query('SELECT * FROM role', (err, res) => {
         if (err) throw err;
-        if (res.length > 0) {
+        if (res.length < 1) {
+            inquirer.prompt([
+                {
+                    name: 'noRoles',
+                    type: 'list',
+                    message: 'There are no existing roles in the database...',
+                    choices: ['Go back to update menu']
+                }
+            ]).then(() => {
+                updateMenu();
+            });
+        } else {
             if (roleTitles[0] === 'No existing roles in database') {
                 roleTitles.splice(0, 1);
             }
@@ -709,54 +736,54 @@ const updateRoleMenu = () => {
                 roles.push({id, title, salary, department_id});
                 roleTitles.push(`${id} | ${title} | $${salary}/yr`);
             });
+
+            inquirer.prompt([
+                {
+                    name: 'updateRole',
+                    type: 'list',
+                    message: 'Select a role to update:',
+                    choices: roleTitles
+                }
+            ])
+            .then((answer) => {
+                if (answer.updateRole === 'No existing roles in database') {
+                    updateMenu();
+                } else {
+                    roleId = parseInt(answer.updateRole.split(' ').splice(0));
+                    roleTitle = answer.updateRole.split(' ').splice(2, 1);
+                    roleSalary = answer.updateRole.split(' ').splice(4, 1);
+    
+                    inquirer.prompt([
+                        {
+                            name: 'updateRoleAction',
+                            type: 'list',
+                            message: 'What would you like to update?',
+                            choices: [
+                                'Update title',
+                                'Update salary',
+                                'Update department',
+                                'Go back to update menu'
+                            ]
+                        }
+                    ]).then((answer) => {
+                        switch(answer.updateRoleAction) {
+                            case 'Update title':
+                                updateRoleTitle(roleId, roleTitle);
+                                break;
+                            case 'Update salary':
+                                updateRoleSalary(roleId, roleSalary);
+                                break;
+                            case 'Update department':
+                                updateRoleDepartment(roleId);
+                                break;
+                            default:
+                                updateMenu();
+                                break;
+                        };
+                    });
+                };            
+            });
         };
-
-        inquirer.prompt([
-            {
-                name: 'updateRole',
-                type: 'list',
-                message: 'Select a role to update:',
-                choices: roleTitles
-            }
-        ])
-        .then((answer) => {
-            if (answer.updateRole === 'No existing roles in database') {
-                updateMenu();
-            } else {
-                roleId = parseInt(answer.updateRole.split(' ').splice(0));
-                roleTitle = answer.updateRole.split(' ').splice(2, 1);
-                roleSalary = answer.updateRole.split(' ').splice(4, 1);
-
-                inquirer.prompt([
-                    {
-                        name: 'updateRoleAction',
-                        type: 'list',
-                        message: 'What would you like to update?',
-                        choices: [
-                            'Update title',
-                            'Update salary',
-                            'Update department',
-                            'Go back to update menu'
-                        ]
-                    }
-                ]).then((answer) => {
-                    switch(answer.updateRoleAction) {
-                        case 'Update title':
-                            updateRoleTitle(roleId, roleTitle);
-                            break;
-                        case 'Update salary':
-                            updateRoleSalary(roleId, roleSalary);
-                            break;
-                        case 'Update department':
-                            updateRoleDepartment(roleId);
-                            break;
-                        default:
-                            updateMenu();
-                            break;
-                    };
-                });
-            };            
-        });
     });
 };
 
