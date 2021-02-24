@@ -447,3 +447,37 @@ const viewDepartments = () => {
         setTimeout(viewMenu, 2000);
     });
 }
+
+// UPDATE EMPLOYEE/ROLE/DEPARTMENT MENU
+const updateMenu = () => {
+    inquirer.prompt([
+        {
+            name: 'updateAction',
+            type: 'list',
+            message: '----------UPDATE MENU----------\nWhat would you like to update?',
+            choices: [
+                'Update an employee',
+                'Update a role',
+                'Update a department',
+                'Go back'
+            ]
+        }
+    ])
+    .then((answer) => {
+        // Continue to functions
+        switch(answer.updateAction) {
+            case 'Update an employee':
+                viewEmployeeAll();
+                break;
+            case 'Update a role':
+                viewEmployeeByRole();
+                break;
+            case 'Update a department':
+                viewEmployeeByDepartment();
+                break;
+            default:
+                actionMenu();
+                break;
+        }
+    });
+};
