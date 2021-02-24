@@ -467,16 +467,59 @@ const updateMenu = () => {
         // Continue to functions
         switch(answer.updateAction) {
             case 'Update an employee':
-                viewEmployeeAll();
+                updateEmployeeMenu();
                 break;
             case 'Update a role':
-                viewEmployeeByRole();
+                updateRoleMenu();
                 break;
             case 'Update a department':
-                viewEmployeeByDepartment();
+                updateDepartment();
                 break;
             default:
                 actionMenu();
+                break;
+        }
+    });
+};
+
+// UPDATE EMPLOYEE MENU 
+const updateEmployeeMenu = () => {
+    inquirer.prompt([
+        {
+            name: 'employeeName',
+            type: 'input',
+            message: 'What is the id of the employee you would like to update?',
+        },
+        {
+            name: 'updateEmployee',
+            type: 'list',
+            message: '----------UPDATE EMPLOYEE MENU----------\nWhat data would you like to update?',
+            choices: [
+                'Employee name',
+                'Employee role',
+                'Employee manager',
+                'All data',
+                'Go back'
+            ]
+        }
+    ])
+    .then((answer) => {
+        // Continue to functions
+        switch(answer.updateEmployee) {
+            case 'Employee name':
+                updateEmployeeName();
+                break;
+            case 'Employee role':
+                updateEmployeeRole();
+                break;
+            case 'Employee manager':
+                updateEmployeeManager();
+                break;
+            case 'All data':
+                updateEmployeeAll();
+                break;
+            default:
+                updateMenu();
                 break;
         }
     });
