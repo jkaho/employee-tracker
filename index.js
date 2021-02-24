@@ -509,13 +509,99 @@ const updateMenu = () => {
 
 // UPDATE EMPLOYEE MENU 
 const updateEmployeeMenu = () => {
+    let method;
     let employee;
     let employeeRoleId;
     let employeeRole;
+    let employeeId;
     let managerId;
     let managerName;
+    employeeNames = ['No existing employees in database'];
 
-    connection.query('SELECT * FROM employee', (err, res) => {
+    const updateEmployeePromise = (answer) => {
+        if (method === 'input') {
+            employeeId = parseInt(answer.employee);
+        } else {
+            employeeId = parseInt(answer.employee.split(' ').splice(0, 1));
+        };
+        connection.query(
+            `SELECT * FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                if (err) throw err;
+                employee = res[0].first_name + ' ' + res[0].last_name;
+                
+                if (res[0].role_id !== null) {
+                    employeeRoleId = parseInt(res[0].role_id);
+                } else {
+                    employeeRoleId = null;
+                }
+
+                if (res[0].manager_id !== null) {
+                    managerId = parseInt(res[0].manager_id);
+                } else {
+                    managerId = null;
+                }
+    
+                if (typeof(managerId) === "object") {
+                    managerName = 'No manager';
+                    managerId = 'N/A';
+                } else {
+                    connection.query(`SELECT * FROM employee WHERE id = ${managerId}`, (err, res) => {
+                        if (err) throw err;
+                        managerName = res[0].first_name + ' ' + res[0].last_name;
+                    });  
+                };
+    
+                connection.query(
+                    `SELECT * FROM role WHERE id = ${employeeRoleId}`, (err, res) => {
+                        if (err) throw err;
+                        if (res.length > 0) {
+                            employeeRole = res[0].title;
+                        } else {
+                            employeeRole = 'no existing role'
+                        };
+    
+                        inquirer.prompt([
+                            {
+                                name: 'updateEmployee',
+                                type: 'list',
+                                message: `----------UPDATE EMPLOYEE MENU (${employee}, ${employeeRole})----------\nWhat data would you like to update?`,
+                                choices: [
+                                    'Employee name',
+                                    'Employee role',
+                                    'Employee manager',
+                                    'Go back'
+                                ]
+                            }
+                        ])
+                        .then((answer) => {
+                            // Continue to functions
+                            switch(answer.updateEmployee) {
+                                case 'Employee name':
+                                    updateEmployeeName(employeeId, employee);
+                                    break;
+                                case 'Employee role':
+                                    updateEmployeeRole(employeeId, employee, employeeRole);
+                                    break;
+                                case 'Employee manager':
+                                    updateEmployeeManager(employeeId, managerId, managerName);
+                                    break;
+                                default:
+                                    updateMenu();
+                                    break;
+                            };
+                        });
+                    }
+                );
+            }
+        );
+    };
+
+    let query = 'SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name ';
+    query += 'FROM employee ';
+    query += 'LEFT JOIN role ON employee.role_id = role.id ';
+    query += 'LEFT JOIN department ON role.department_id = department.id';
+
+    connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length < 1) {
             inquirer.prompt([
@@ -529,78 +615,52 @@ const updateEmployeeMenu = () => {
                 updateMenu();
             });
         } else {
+            if (employeeNames[0] === 'No existing employees in database') {
+                employeeNames.splice(0, 1);
+            };
+            res.forEach((item) => {
+                employeeNames.push(`${item.id} | ${item.first_name} ${item.last_name} | ${item.title} | ${item.name}`);
+            });
+
             inquirer.prompt([
                 {
-                    name: 'employeeId',
-                    type: 'input',
-                    message: 'What is the id of the employee you would like to update?',
+                    name: 'inputOrView',
+                    type: 'list',
+                    message: 'Select one of the following:',
+                    choices: [
+                        'Find employee by id',
+                        'View all employees'
+                    ]
                 }
-            ])
-            .then((answer) => {
-                let employeeId = parseInt(answer.employeeId);
-                
-                connection.query(
-                    `SELECT * FROM employee WHERE id = ${employeeId}`, (err, res) => {
-                        if (err) throw err;
-                        employee = res[0].first_name + ' ' + res[0].last_name;
-                        employeeRoleId = parseInt(res[0].role_id);
-                        if (res[0].manager_id !== null) {
-                            managerId = parseInt(res[0].manager_id);
-                        } else {
-                            managerId = null;
-                        }
-        
-                        if (typeof(managerId) === "object") {
-                            managerName = 'No manager';
-                            managerId = 'N/A';
-                        } else {
-                            connection.query(`SELECT * FROM employee WHERE id = ${managerId}`, (err, res) => {
-                                if (err) throw err;
-                                managerName = res[0].first_name + ' ' + res[0].last_name;
-                            });  
-                        };
-        
-                        connection.query(
-                            `SELECT * FROM role WHERE id = ${employeeRoleId}`, (err, res) => {
-                                if (err) throw err;
-                                employeeRole = res[0].title;
-        
-                                inquirer.prompt([
-                                    {
-                                        name: 'updateEmployee',
-                                        type: 'list',
-                                        message: `----------UPDATE EMPLOYEE MENU (${employee}, ${employeeRole})----------\nWhat data would you like to update?`,
-                                        choices: [
-                                            'Employee name',
-                                            'Employee role',
-                                            'Employee manager',
-                                            'Go back'
-                                        ]
-                                    }
-                                ])
-                                .then((answer) => {
-                                    // Continue to functions
-                                    switch(answer.updateEmployee) {
-                                        case 'Employee name':
-                                            updateEmployeeName(employeeId, employee);
-                                            break;
-                                        case 'Employee role':
-                                            updateEmployeeRole(employeeId, employee, employeeRole);
-                                            break;
-                                        case 'Employee manager':
-                                            updateEmployeeManager(employeeId, managerId, managerName);
-                                            break;
-                                        default:
-                                            updateMenu();
-                                            break;
-                                    };
-                                });
+            ]).then((answer) => {
+                switch(answer.inputOrView) {
+                    case 'Find employee by id':
+                        method = 'input';
+                        inquirer.prompt([
+                            {
+                                name: 'employee',
+                                type: 'input',
+                                message: 'What is the id of the employee you would like to update?',
                             }
-                        );
-                    }
-                );
-            });
-        }
+                        ]).then((answer) => updateEmployeePromise(answer));
+                        break;
+                    case 'View all employees':
+                        method = 'list';
+                        inquirer.prompt([
+                            {
+                                name: 'employee',
+                                type: 'list',
+                                message: 'Select one of the following employees to update:',
+                                choices: employeeNames
+                            }
+                        ]).then((answer) => updateEmployeePromise(answer));
+                        break;
+                    default: 
+                        updateMenu();
+                        break;
+                };
+            })
+        };
     });
 };
 
