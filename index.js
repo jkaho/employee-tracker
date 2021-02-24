@@ -184,7 +184,7 @@ const addRole = () => {
                         console.log(`Role successfully added!\nRole: ${answers.roleTitle}\nSalary: ${answers.roleSalary}\nDepartment: ${departmentName}`);
                         setTimeout(actionMenu, 2000);
                     }
-                )
+                );
             });
         }
     );    
@@ -235,6 +235,7 @@ const addEmployee = () => {
                 let roleId = '';
                 if (answers.employeeRole === 'No existing roles in database') {
                     roleId = null;
+                    employeeRole = 'No existing role'
                 } else {
                     for (let i = 0; i < roles.length; i++) {
                         if (roles[i].title === answers.employeeRole) {
@@ -377,11 +378,14 @@ const viewEmployeeAll = () => {
     query += 'LEFT JOIN department ON role.id = department.id ';
     query += 'LEFT JOIN employee B ON A.manager_id = B.id';
     connection.query(query, (err, res) => {
-            if (err) throw err;
+        if (err) throw err;
+        if (res.length > 1) {
             console.table(res);
-            setTimeout(viewMenu, 2000);
-        }
-    );
+        } else {
+            console.log('There is no employee data to display.')
+        };
+        setTimeout(viewMenu, 2000);
+    });
 };
 
 // View employee data by role
@@ -394,7 +398,11 @@ const viewEmployeeByRole = () => {
     query += 'ORDER BY role';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.table(res);
+        if (res.length > 1) {
+            console.table(res);
+        } else {
+            console.log('There is no employee data to display.')
+        };
         setTimeout(viewMenu, 2000);
     });
 };
@@ -409,7 +417,11 @@ const viewEmployeeByDepartment = () => {
     query += 'ORDER BY department';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.table(res);
+        if (res.length > 1) {
+            console.table(res);
+        } else {
+            console.log('There is no employee data to display.')
+        };
         setTimeout(viewMenu, 2000);
     });
 };
@@ -424,7 +436,11 @@ const viewEmployeeByManager = () => {
     query += 'ORDER BY A.manager_id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.table(res);
+        if (res.length > 1) {
+            console.table(res);
+        } else {
+            console.log('There is no employee data to display.')
+        };
         setTimeout(viewMenu, 2000);
     });
 };
@@ -434,7 +450,11 @@ const viewRoles = () => {
     let query = 'SELECT * FROM role';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.table(res);
+        if (res.length > 1) {
+            console.table(res);
+        } else {
+            console.log('There is no role data to display.')
+        };
         setTimeout(viewMenu, 2000);
     });
 };
@@ -444,10 +464,14 @@ const viewDepartments = () => {
     let query = 'SELECT * FROM department';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        console.table(res);
+        if (res.length > 1) {
+            console.table(res);
+        } else {
+            console.log('There is no department data to display.')
+        };
         setTimeout(viewMenu, 2000);
     });
-}
+};
 
 // UPDATE EMPLOYEE/ROLE/DEPARTMENT MENU
 const updateMenu = () => {
