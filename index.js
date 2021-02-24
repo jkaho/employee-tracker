@@ -793,8 +793,50 @@ const updateRoleSalary = (roleId, roleSalary) => {
             connection.query(`SELECT salary FROM role WHERE id = ${roleId}`, (err, res) => {
                 if (err) throw err;
                 console.log(`${roleSalary} (previous salary) ---> $${res[0].salary}/yr (updated salary)`)
-                setTimeout(updateMenu, 2000);
             });
         });
-    })
-}
+    });
+};
+
+// Update role department
+const updateRoleDepartment = (roleId) => {
+    departmentNames = ['No existing departments in database'];
+    connection.query('SELECT * FROM department', (err, res) => {
+        if (err) throw err;
+        if (res.length > 0) {
+            if (departmentNames[0] === 'No existing departments in database') {
+                departmentNames.splice(0, 1);
+            };
+            res.forEach(({ id, name }) => {
+                departmentNames.push(`${id} | ${name}`);
+            });
+        };
+
+        inquirer.prompt([
+            {
+                name: 'updateRoleDepartment',
+                type: 'list', 
+                message: 'Select new department for role:',
+                choices: departmentNames
+            }
+        ])
+        .then((answer) => {
+            if (answer.updateRoleDepartment === 'No existing roles in database') {
+                updateMenu();
+            } else {
+                let departmentId = parseInt(answer.updateRoleDepartment.split(' ').splice(0));
+                let departmentName  = answer.updateRoleDepartment.split(' ').splice(2);
+                connection.query(`UPDATE role SET department_id = ${departmentId} WHERE id = ${roleId}`, (err, res) => {
+                    if (err) throw err;
+                    console.log(`Role (id: ${roleId}) department successfully updated!`);
+                    connection.query(`SELECT name FROM department WHERE id = ${departmentId}`, (err, res) => {
+                        if (err) throw err;
+                        console.log(`${departmentName} (previous department) ---> ${res[0].name} (updated department)`);
+
+                        setTimeout(updateMenu, 2000);
+                    });
+                });
+            };
+        });
+    });
+};
