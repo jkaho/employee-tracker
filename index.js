@@ -368,7 +368,7 @@ const viewEmployeeMenu = () => {
     });
 };
 
-// View all employee information 
+// View all employee data 
 const viewEmployeeAll = () => {
     query = 'SELECT A.id, A.first_name, A.last_name, role.title AS role, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
@@ -377,8 +377,23 @@ const viewEmployeeAll = () => {
     query += 'LEFT JOIN employee B ON A.manager_id = B.id';
     connection.query(query, (err, res) => {
             if (err) throw err;
-            console.table(res)
+            console.table(res);
             setTimeout(viewMenu, 2000);
         }
     );
 };
+
+// View employee data by role
+const viewEmployeeByRole = () => {
+    query = 'SELECT A.id, A.first_name, A.last_name, role.title AS role, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
+    query += 'FROM employee A ';
+    query += 'LEFT JOIN role ON A.role_id = role.id ';
+    query += 'LEFT JOIN department ON role.id = department.id ';
+    query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
+    query += 'ORDER BY role';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        setTimeout(viewMenu, 2000);
+    })
+}
