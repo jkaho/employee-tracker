@@ -120,7 +120,7 @@ const addDepartment = () => {
             (err, res) => {
                 if (err) throw err;
                 console.log(`'${answer.departmentName}' department successfully added to database!`);
-                actionMenu();
+                setTimeout(actionMenu, 2000);
             }
         );
     });
@@ -170,7 +170,7 @@ const addRole = () => {
                     `INSERT INTO role(title, salary, department_id) VALUES ('${answers.roleTitle}', '${answers.roleSalary}', '${departmentId}')`, (err, res) => {
                         if (err) throw err;
                         console.log(`Role successfully added!\nRole: ${answers.roleTitle}\nSalary: ${answers.roleSalary}\nDepartment: ${departmentName}`);
-                        actionMenu();
+                        setTimeout(actionMenu, 2000);
                     }
                 )
             });
@@ -260,7 +260,7 @@ const addEmployee = () => {
                             connection.query(query, (err, res) => {
                                 if (err) throw err;
                                 console.log(`Employee successfully added!\nName: ${employeeFirstName} ${employeeLastName}\nRole: ${employeeRole}\nManager: ${managerName}`);
-                                actionMenu();
+                                setTimeout(actionMenu, 2000);
                             });
                         });
                     }
