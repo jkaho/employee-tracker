@@ -725,7 +725,7 @@ const updateRoleMenu = () => {
                 roleId = parseInt(answer.updateRole.split(' ').splice(0));
                 roleTitle = answer.updateRole.split(' ').splice(2, 1);
                 roleSalary = answer.updateRole.split(' ').splice(4, 1);
-                
+
                 inquirer.prompt([
                     {
                         name: 'updateRoleAction',
@@ -845,5 +845,56 @@ const updateRoleDepartment = (roleId) => {
                 });
             };
         });
+    });
+};
+
+// Update department name
+const updateDepartment = () => {
+    departmentNames = ['No existing departments in database'];
+
+    connection.query('SELECT * FROM department', (err, res) => {
+        if (err) throw err;
+        if (res.length > 0) {
+            if (departmentNames[0] === 'No existing departments in database') {
+                departmentNames.splice(0, 1);
+            };
+            res.forEach(({ id, name }) => {
+                departmentNames.push(`${id} | ${name}`);
+            });
+
+            inquirer.prompt([
+                {
+                    name: 'updateDepartment',
+                    type: 'list',
+                    message: 'Select department to update:',
+                    choices: departmentNames
+                }
+            ])
+            .then((answer) => {
+                if (answer.updateDepartment === 'No existing departments in database') {
+                    updateMenu();
+                } else {
+                    let departmentId = parseInt(answer.updateDepartment.split(' ').splice(0, 1));
+                    let departmentName = answer.updateDepartment.split(' ').splice(2).join(' ').trim();
+
+                    inquirer.prompt([
+                        {
+                            name: 'updatedDepartmentName',
+                            type: 'input',
+                            message: 'Update department name:'
+                        }
+                    ])
+                    .then((answer) => {
+                        let updatedDepartmentName = answer.updatedDepartmentName;
+
+                        connection.query(`UPDATE department SET name = '${updatedDepartmentName}' WHERE id = ${departmentId}`, (err, res) => {
+                            if (err) throw err;
+                            console.log(`Department (id: ${departmentId}) name successfully updated!\n${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`);
+                            setTimeout(updateMenu, 2000);
+                        });
+                    });
+                };
+            });
+        };
     });
 };
