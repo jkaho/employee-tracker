@@ -471,8 +471,8 @@ const viewEmployeeByRoleEach = () => {
                 query += 'LEFT JOIN role ON A.role_id = role.id ';
                 query += 'LEFT JOIN department ON role.department_id = department.id ';
                 query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
-                query += `WHERE role.id = ${roleId}`;
-                connection.query(query, (err, res) => {
+                query += `WHERE role.id = ?`;
+                connection.query(query, [roleId], (err, res) => {
                     if (err) throw err;
                     if (res.length < 1) {
                         console.log('There is no employee data for this role.');
@@ -564,8 +564,8 @@ const viewEmployeeByDepartmentEach = () => {
                 query += 'LEFT JOIN role ON A.role_id = role.id ';
                 query += 'LEFT JOIN department ON role.department_id = department.id ';
                 query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
-                query += `WHERE role.department_id = ${departmentId}`;
-                connection.query(query, (err, res) => {
+                query += `WHERE role.department_id = ?`;
+                connection.query(query, [departmentId], (err, res) => {
                     if (err) throw err;
                     if (res.length < 1) {
                         console.log('There is no employee data for this role.');
@@ -656,9 +656,9 @@ const viewEmployeeByManagerEach = () => {
                 query += 'LEFT JOIN role ON A.role_id = role.id ';
                 query += 'LEFT JOIN department ON role.department_id = department.id ';
                 query += 'JOIN employee B ON A.manager_id = B.id ';
-                query += `WHERE B.id = ${managerId} `;
+                query += `WHERE B.id = ? `;
                 query += 'ORDER BY A.manager_id';
-                connection.query(query, (err, res) => {
+                connection.query(query, [managerId], (err, res) => {
                     if (err) throw err;
                     console.table(res);
                     setTimeout(viewMenu, 2000);
@@ -749,9 +749,8 @@ const viewDepartmentBudget = () => {
                 }
             ]).then((answer) => {
                 let departmentId = parseInt(answer.departmentName.split(' ').splice(0, 1));
-                let departmentName = answer.departmentName.split(' ').splice(2).join(' ').trim();
-
-                connection.query(`SELECT SUM(salary) AS total_utilized_budget FROM role WHERE department_id = ${departmentId}`, (err, res) => {
+                connection.query(`SELECT SUM(salary) AS total_utilized_budget FROM role WHERE department_id = ?`, [departmentId],
+                (err, res) => {
                     if (err) throw err;
                     console.table(res);
                     setTimeout(viewMenu, 2000);
