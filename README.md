@@ -2,7 +2,7 @@
 
 ## Description 
 
-Employee Tracker is a command-line Content Management System (CMS) application that allows users to add, view, update and delete data relating to employees, roles and departments. 
+*Employee Tracker* is a command-line Content Management System (CMS) application that allows users to add, view, update and delete data relating to employees, roles and departments. 
 
 ## Table of Contents
 
