@@ -116,10 +116,10 @@ const addDepartment = () => {
     ])
     .then((answer) => {
         connection.query(
-            `INSERT INTO department(name) VALUES(?)`, [answer.departmentName],
+            `INSERT INTO department(name) VALUES(?)`, [answer.departmentName.trim()],
             (err, res) => {
                 if (err) throw err;
-                console.log(`'${answer.departmentName}' department successfully added to database!`);
+                console.log(`'${answer.departmentName.trim()}' department successfully added to database!`);
                 setTimeout(actionMenu, 2000);
             }
         );
@@ -187,10 +187,10 @@ const addRole = () => {
                 };
  
                 connection.query(
-                    `INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)`, [answers.roleTitle, parseInt(answers.roleSalary), departmentId],
+                    `INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)`, [answers.roleTitle.trim(), parseInt(answers.roleSalary), departmentId],
                     (err, res) => {
                         if (err) throw err;
-                        console.log(`Role successfully added!\nRole: ${answers.roleTitle}\nSalary: $${answers.roleSalary}/yr\nDepartment: ${departmentName}`);
+                        console.log(`Role successfully added!\nRole: ${answers.roleTitle.trim()}\nSalary: $${answers.roleSalary}/yr\nDepartment: ${departmentName}`);
                         setTimeout(actionMenu, 2000);
                     }
                 );
@@ -238,8 +238,8 @@ const addEmployee = () => {
                 }
             ])
             .then((answers) => {
-                let employeeFirstName = answers.employeeFirstName;
-                let employeeLastName = answers.employeeLastName;
+                let employeeFirstName = answers.employeeFirstName.trim();
+                let employeeLastName = answers.employeeLastName.trim();
                 let employeeRole = answers.employeeRole;
                 let roleId = '';
                 if (answers.employeeRole === 'No existing roles in database') {
