@@ -355,13 +355,13 @@ const viewEmployeeMenu = () => {
                 viewEmployeeAll();
                 break;
             case 'View by role':
-                viewEmployeeByRole();
+                viewEmployeeByRoleMenu();
                 break;
             case 'View by department':
-                viewEmployeeByDepartment();
+                viewEmployeeByDepartmentMenu();
                 break;
             case 'View by manager':
-                viewEmployeeByManager();
+                viewEmployeeByManagerMenu();
                 break;
             default:
                 viewMenu();
@@ -388,8 +388,47 @@ const viewEmployeeAll = () => {
     });
 };
 
-// View employee data by role
-const viewEmployeeByRole = () => {
+// View employee data by each role
+const viewEmployeeByRoleEach = () => {
+    roleTitles = [];
+    connection.query('SELECT * FROM role', (err, res) => {
+        if (err) throw err;
+        if (res < 1) {
+            console.log('There are no roles to display.');
+            setTimeout(viewMenu, 2000);
+        } else {
+            res.forEach((item) => {
+                roleTitles.push(`${item.id} | ${item.title}`);
+            });
+
+            inquirer.prompt([
+                {
+                    name: 'roleSelect',
+                    type: 'list',
+                    message: 'Select role to view employees:',
+                    choices: roleTitles
+                }
+            ]).then((answer) => {
+                let roleId = parseInt(answer.roleSelect.split('|').splice(0, 1).join('').trim());
+
+                let query = 'SELECT role.title AS role, A.id, A.first_name, A.last_name, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
+                query += 'FROM employee A ';
+                query += 'LEFT JOIN role ON A.role_id = role.id ';
+                query += 'LEFT JOIN department ON role.id = department.id ';
+                query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
+                query += `WHERE role.id = ${roleId}`;
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    console.log(res);
+                    setTimeout(viewMenu, 2000);
+                });
+            });
+        };
+    });
+};
+
+// View employee data by all roles
+const viewEmployeeByRoleAll = () => {
     let query = 'SELECT role.title AS role, A.id, A.first_name, A.last_name, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
     query += 'LEFT JOIN role ON A.role_id = role.id ';
