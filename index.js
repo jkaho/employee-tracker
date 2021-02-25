@@ -2,7 +2,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 
 // Database components
 let departments = [];
@@ -127,6 +126,14 @@ const addDepartment = () => {
     });
 };
 
+// Validation for numeric inputs
+const validateNum = (num) => {
+    if (/^[0-9]+$/.test(num)) {
+        return true;
+    }
+    return 'Invalid input. Only numeric values are accepted.'
+};
+
 // Function for adding a role
 const addRole = () => {
     departments = [];
@@ -154,7 +161,8 @@ const addRole = () => {
                 {
                     name: 'roleSalary',
                     type: 'input',
-                    message: 'New role salary:'
+                    message: 'New role salary:',
+                    validate: validateNum
                 },
                 {
                     name: 'roleDepartment',
