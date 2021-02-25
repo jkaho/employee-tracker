@@ -477,8 +477,36 @@ const viewEmployeeByRoleEach = () => {
     });
 };
 
-// View employee data by department
-const viewEmployeeByDepartment = () => {
+// VIEW EMPLOYEE BY DEPARTMENT MENU 
+const viewEmployeeByDepartmentMenu = () => {
+    inquirer.prompt([
+        {
+            name: 'allOrEach',
+            type: 'list',
+            message: 'How would you like to view employees?',
+            choices: [
+                'View by all departments',
+                'View by individual department',
+                'Go back to view employee menu'
+            ]
+        }
+    ]).then((answer) => {
+        switch(answer.allOrEach) {
+            case 'View by all departments':
+                viewEmployeeByDepartmentAll();
+                break;
+            case 'View by individual department':
+                viewEmployeeByDepartmentEach();
+                break;
+            default:
+                viewEmployeeMenu();
+                break;
+        };
+    });
+};
+
+// View employee data by all departments
+const viewEmployeeByDepartmentAll = () => {
     let query = 'SELECT department.name AS department, A.id, A.first_name, A.last_name, role.title AS role, role.salary, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
     query += 'LEFT JOIN role ON A.role_id = role.id ';
