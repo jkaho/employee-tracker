@@ -976,7 +976,7 @@ const updateEmployeeName = (employeeId, employee) => {
     .then((answers) => {
         let query = 'UPDATE employee ';
         query += 'SET first_name = ?, last_name = ? WHERE id = ?'
-        connection.query(query, [answers.updateFirstName, answers.updateLastName, employeeId], (err, res) => {
+        connection.query(query, [answers.updateFirstName.trim(), answers.updateLastName.trim(), employeeId], (err, res) => {
             if (err) throw err;
             console.log(`Employee (id: ${employeeId}) name successfully updated!`);
             connection.query(
@@ -1206,7 +1206,7 @@ const updateRoleTitle = (roleId, roleTitle) => {
         }
     ])
     .then((answer) => {
-        connection.query(`UPDATE role SET title = ? WHERE id = ?`, [answer.updateRoleTitle, roleId], (err, res) => {
+        connection.query(`UPDATE role SET title = ? WHERE id = ?`, [answer.updateRoleTitle.trim(), roleId], (err, res) => {
             if (err) throw err;
             console.log(`Role (id: ${roleId}) title successfully updated!`);
 
@@ -1332,7 +1332,7 @@ const updateDepartment = () => {
                     }
                 ])
                 .then((answer) => {
-                    let updatedDepartmentName = answer.updatedDepartmentName;
+                    let updatedDepartmentName = answer.updatedDepartmentName.trim();
 
                     connection.query(`UPDATE department SET name = ? WHERE id = ?`, [updatedDepartmentName, departmentId], (err, res) => {
                         if (err) throw err;
@@ -1428,7 +1428,8 @@ const deleteEmployee = () => {
                             {
                                 name: 'employeeId',
                                 type: 'input',
-                                message: 'Employee id:'
+                                message: 'Employee id:',
+                                validate: validateNum
                             }
                         ])
                         .then((answer) => {
