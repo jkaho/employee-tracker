@@ -1430,7 +1430,7 @@ const deleteEmployee = () => {
                         ])
                         .then((answer) => {
                             let employeeId = parseInt(answer.employeeId);
-                            connection.query(`SELECT first_name, last_name FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                            connection.query(`SELECT first_name, last_name FROM employee WHERE id = ?`, [employeeId], (err, res) => {
                                 if (err) throw err;
                                 if (res.length < 1) {
                                     console.log(`Sorry! No employees with the id ${employeeId} found in the database.`);
@@ -1446,7 +1446,7 @@ const deleteEmployee = () => {
                                     ])
                                     .then((answer) => {
                                         if (answer.confirmation === true) {
-                                            connection.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                                            connection.query(`DELETE FROM employee WHERE id = ?`, [employeeId], (err, res) => {
                                                 if (err) throw err;
                                                 console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
                                                 setTimeout(deleteMenu, 2000);
@@ -1481,7 +1481,7 @@ const deleteEmployee = () => {
                             ])
                             .then((answer) => {
                                 if (answer.confirmation === true) {
-                                    connection.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                                    connection.query(`DELETE FROM employee WHERE id = ?`, [employeeId], (err, res) => {
                                         if (err) throw err;
                                         console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
                                         setTimeout(deleteMenu, 2000);
@@ -1547,7 +1547,7 @@ const deleteRole = () => {
                 }
             ]).then((answer) => {
                 if (answer.deleteConfirm === true) {
-                    connection.query(`DELETE FROM role WHERE id = ${roleId}`, (err, res) => {
+                    connection.query(`DELETE FROM role WHERE id = ?`, [roleId], (err, res) => {
                         if (err) throw err;
                         console.log(`Role ('${roleName}', id: ${roleId}) successfully deleted.`);
                         setTimeout(deleteMenu, 2000);
@@ -1605,7 +1605,7 @@ const deleteDepartment = () => {
                 }
             ]).then((answer) => {
                 if (answer.deleteConfirm === true) {
-                    connection.query(`DELETE FROM department WHERE id = ${departmentId}`, (err, res) => {
+                    connection.query(`DELETE FROM department WHERE id = ?`, [departmentId], (err, res) => {
                         if (err) throw err;
                         console.log(`Department ('${departmentName}', id: ${departmentId}) successfully deleted.`);
                         setTimeout(deleteMenu, 2000);
