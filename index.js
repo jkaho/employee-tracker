@@ -811,11 +811,15 @@ const updateEmployeeMenu = () => {
         } else {
             employeeId = parseInt(answer.employee.split(' ').splice(0, 1));
         };
-        connection.query(
-            `SELECT * FROM employee WHERE id = ${employeeId}`, (err, res) => {
-                if (err) throw err;
+        connection.query(`SELECT * FROM employee WHERE id = ?`, [employeeId], (err, res) => {
+            if (err) throw err;
+
+            if (res.length < 1) {
+                console.log(`Sorry! No employees with the id ${employeeId} found in the database.`);
+                setTimeout(updateMenu, 2000);
+            } else {
                 employee = res[0].first_name + ' ' + res[0].last_name;
-                
+            
                 if (res[0].role_id !== null) {
                     employeeRoleId = parseInt(res[0].role_id);
                 } else {
@@ -827,26 +831,26 @@ const updateEmployeeMenu = () => {
                 } else {
                     managerId = null;
                 }
-    
+
                 if (typeof(managerId) === "object") {
                     managerName = 'No manager';
                     managerId = 'N/A';
                 } else {
-                    connection.query(`SELECT * FROM employee WHERE id = ${managerId}`, (err, res) => {
+                    connection.query(`SELECT * FROM employee WHERE id = ?`, [managerId], (err, res) => {
                         if (err) throw err;
                         managerName = res[0].first_name + ' ' + res[0].last_name;
                     });  
                 };
-    
+
                 connection.query(
-                    `SELECT * FROM role WHERE id = ${employeeRoleId}`, (err, res) => {
+                    `SELECT * FROM role WHERE id = ?`, [employeeRoleId], (err, res) => {
                         if (err) throw err;
                         if (res.length > 0) {
                             employeeRole = res[0].title;
                         } else {
                             employeeRole = 'no existing role'
                         };
-    
+
                         inquirer.prompt([
                             {
                                 name: 'updateEmployee',
@@ -880,7 +884,7 @@ const updateEmployeeMenu = () => {
                     }
                 );
             }
-        );
+        });
     };
 
     let query = 'SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name ';
@@ -973,7 +977,7 @@ const updateEmployeeName = (employeeId, employee) => {
             if (err) throw err;
             console.log(`Employee (id: ${employeeId}) name successfully updated!`);
             connection.query(
-                `SELECT * FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                `SELECT * FROM employee WHERE id = ?`, [employeeId], (err, res) => {
                     if (err) throw err;
                     console.log(`${employee} (previous name) ---> ${res[0].first_name} ${res[0].last_name} (updated name)\n`);
                     setTimeout(updateMenu, 2000);
@@ -1026,7 +1030,7 @@ const updateEmployeeRole = (employeeId, employee, employeeRole) => {
                         if (err) throw err;
                         console.log(`Employee (id: ${employeeId} | ${employee}) role successfully updated!`);
                         connection.query(
-                            `SELECT * FROM role WHERE id = ${roleId}`, (err, res) => {
+                            `SELECT * FROM role WHERE id = ?`, [roleId], (err, res) => {
                                 if (err) throw err;
                                 console.log(`${employeeRole} (previous role) ---> ${res[0].title} (updated role)\n`);
                                 setTimeout(updateMenu, 2000);
@@ -1177,7 +1181,7 @@ const updateRoleMenu = () => {
                             updateRoleSalary(roleId, roleSalary);
                             break;
                         case 'Update department':
-                            updateRoleDepartment(roleId, departmentId, departmentName);
+                            updateRoleDepartment(roleId, departmentName);
                             break;
                         default:
                             updateMenu();
@@ -1199,11 +1203,11 @@ const updateRoleTitle = (roleId, roleTitle) => {
         }
     ])
     .then((answer) => {
-        connection.query(`UPDATE role SET title = '${answer.updateRoleTitle}' WHERE id = ${roleId}`, (err, res) => {
+        connection.query(`UPDATE role SET title = ? WHERE id = ?`, [answer.updateRoleTitle, roleId], (err, res) => {
             if (err) throw err;
             console.log(`Role (id: ${roleId}) title successfully updated!`);
 
-            connection.query(`SELECT * FROM role WHERE id = ${roleId}`, (err, res) => {
+            connection.query(`SELECT * FROM role WHERE id = ?`, [roleId], (err, res) => {
                 if (err) throw err;
                 console.log(`${roleTitle} (previous title) ---> ${res[0].title} (updated title)`);
                 setTimeout(updateMenu, 2000);
@@ -1218,16 +1222,17 @@ const updateRoleSalary = (roleId, roleSalary) => {
         {
             name: 'updateRoleSalary',
             type: 'input',
-            message: 'New salary:'
+            message: 'New salary:',
+            validate: validateNum
         }
     ])
     .then((answer) => {
         let newSalary = parseInt(answer.updateRoleSalary);
-        connection.query(`UPDATE role SET salary = ${newSalary} WHERE id = ${roleId}`, (err, res) => {
+        connection.query(`UPDATE role SET salary = ? WHERE id = ?`, [newSalary, roleId], (err, res) => {
             if (err) throw err;
             console.log(`Role (id: ${roleId}) successfully updated!`);
 
-            connection.query(`SELECT salary FROM role WHERE id = ${roleId}`, (err, res) => {
+            connection.query(`SELECT salary FROM role WHERE id = ?`, [roleId], (err, res) => {
                 if (err) throw err;
                 console.log(`${roleSalary} (previous salary) ---> $${res[0].salary}/yr (updated salary)`);
                 setTimeout(updateMenu, 2000);
@@ -1237,7 +1242,7 @@ const updateRoleSalary = (roleId, roleSalary) => {
 };
 
 // Update role department
-const updateRoleDepartment = (roleId, departmentId, departmentName) => {
+const updateRoleDepartment = (roleId, departmentName) => {
     departmentNames = ['No existing departments in database'];
     connection.query(`SELECT * FROM department`, (err, res) => {
         if (err) throw err;
@@ -1270,7 +1275,7 @@ const updateRoleDepartment = (roleId, departmentId, departmentName) => {
         .then((answer) => {
             updatedDepartmentId = parseInt(answer.updateRoleDepartment.split(' ').splice(0));
             updatedDepartmentName  = answer.updateRoleDepartment.split(' ').splice(2);
-            connection.query(`UPDATE role SET department_id = ${updatedDepartmentId} WHERE id = ${roleId}`, (err, res) => {
+            connection.query(`UPDATE role SET department_id = ? WHERE id = ?`, [updatedDepartmentId, roleId], (err, res) => {
                 if (err) throw err;
                 console.log(`Role (id: ${roleId}) department successfully updated!\n${departmentName} (previous department) ---> ${updatedDepartmentName} (updated department)`);
                 setTimeout(updateMenu, 2000);
@@ -1326,7 +1331,7 @@ const updateDepartment = () => {
                 .then((answer) => {
                     let updatedDepartmentName = answer.updatedDepartmentName;
 
-                    connection.query(`UPDATE department SET name = '${updatedDepartmentName}' WHERE id = ${departmentId}`, (err, res) => {
+                    connection.query(`UPDATE department SET name = ? WHERE id = ?`, [updatedDepartmentName, departmentId], (err, res) => {
                         if (err) throw err;
                         console.log(`Department (id: ${departmentId}) name successfully updated!\n${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`);
                         setTimeout(updateMenu, 2000);
