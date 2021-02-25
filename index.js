@@ -1013,7 +1013,7 @@ const updateRoleSalary = (roleId, roleSalary) => {
 
 // Update role department
 const updateRoleDepartment = (roleId, departmentId, departmentName) => {
-    departmentNames = ['There are no existing departments in database'];
+    departmentNames = ['No existing departments in database'];
     connection.query(`SELECT * FROM department`, (err, res) => {
         if (err) throw err;
         if (res.length < 1) {
@@ -1047,7 +1047,7 @@ const updateRoleDepartment = (roleId, departmentId, departmentName) => {
         .then((answer) => {
             updatedDepartmentId = parseInt(answer.updateRoleDepartment.split(' ').splice(0));
             updatedDepartmentName  = answer.updateRoleDepartment.split(' ').splice(2);
-            connection.query(`UPDATE role SET department_id = ${departmentId} WHERE id = ${roleId}`, (err, res) => {
+            connection.query(`UPDATE role SET department_id = ${updatedDepartmentId} WHERE id = ${roleId}`, (err, res) => {
                 if (err) throw err;
                 console.log(`Role (id: ${roleId}) department successfully updated!\n${departmentName} (previous department) ---> ${updatedDepartmentName} (updated department)`);
                 setTimeout(updateMenu, 2000);
