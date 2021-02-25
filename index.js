@@ -528,9 +528,10 @@ const viewDepartmentBudget = () => {
                 let departmentId = parseInt(answer.departmentName.split(' ').splice(0, 1));
                 let departmentName = answer.departmentName.split(' ').splice(2).join(' ').trim();
 
-                connection.query(`SELECT SUM(salary) FROM role WHERE department_id = ${departmentId}`, (err, res) => {
+                connection.query(`SELECT SUM(salary) AS total_utilized_budget FROM role WHERE department_id = ${departmentId}`, (err, res) => {
                     if (err) throw err;
                     console.table(res);
+                    setTimeout(viewMenu, 2000);
                 });
             })
         };
