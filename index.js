@@ -263,82 +263,115 @@ const addEmployee = () => {
                     name: 'employeeLastName',
                     type: 'input',
                     message: 'New employee last name:'
-                },
-                {
-                    name: 'employeeRole',
-                    type: 'list',
-                    message: 'New employee role:',
-                    choices: roleTitles
                 }
-            ])
-            .then((answers) => {
+            ]).then((answers) => {
+                let employeeExists = false;
                 let employeeFirstName = answers.employeeFirstName.trim();
                 let employeeLastName = answers.employeeLastName.trim();
-                let employeeRole = answers.employeeRole;
-                let roleId = '';
-                if (answers.employeeRole === 'No existing roles in database') {
-                    roleId = null;
-                    employeeRole = 'No existing role'
-                } else {
-                    for (let i = 0; i < roles.length; i++) {
-                        if (roles[i].title === answers.employeeRole) {
-                            roleId = roles[i].id;
-                        }
-                    }
-                }
-                connection.query(
-                    'SELECT * FROM employee', (err, res) => {
-                        if (err) throw err;
-                        if (res.length > 0) {
-                            if (employeeNames[0] === 'No existing employees in database') {
-                                employeeNames.splice(0, 1);
-                            }
-                            res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
-                                employees.push({id, first_name, last_name, role_id, manager_id});
-                                employeeNames.push(`${id} | ${first_name} ${last_name}`);
-                            });
-                            employeeNames.push('No manager');
-                        }
-
+                let employeeName = `${employeeFirstName} ${employeeLastName}`;
+                connection.query('SELECT first_name, last_name FROM employee', (err, res) => {
+                    if (err) throw err;
+                    res.forEach((item) => {
+                        if (`${item.first_name} ${item.last_name}` === employeeName) {
+                            employeeExists = true;
+                        }; 
+                    });
+        
+                    if (employeeExists === true) {
                         inquirer.prompt([
                             {
-                                name: 'employeeManager',
-                                type: 'list',
-                                message: 'New employee manager:',
-                                choices: employeeNames
+                                name: 'confirmContinue',
+                                type: 'confirm',
+                                message: `An employee named '${employeeName}' already exists. Would you still like to proceed?`
                             }
-                        ])
-                        .then((answer) => {    
-                            let managerId = '';
-                            let splitAnswer = answer.employeeManager.split(' ');
-                            let managerName = '';                      
-                            if (answer.employeeManager === 'No existing employees in database' || answer.employeeManager == 'No manager') {
-                                managerId = null;
-                                managerName = 'No existing manager'
+                        ]).then((answer) => {
+                            if (answer.confirmContinue === false) {
+                                actionMenu();
                             } else {
-                                managerName = splitAnswer.splice(2, splitAnswer.length).join(' ');  
-                                for (let i = 0; i < employees.length; i++) {
-                                    if (employees[i].id === parseInt(answer.employeeManager.split(' ')[0])) {
-                                        managerId = employees[i].id;
-                                    }
-                                }
-                            }
-
-                            query = 'INSERT INTO employee(first_name, last_name, role_id, manager_id) ';
-                            query += `VALUES(?, ?, ?, ?)`
-                            connection.query(query, [employeeFirstName, employeeLastName, roleId, managerId], (err, res) => {
-                                if (err) throw err;
-                                console.log(`Employee successfully added!\nName: ${employeeFirstName} ${employeeLastName}\nRole: ${employeeRole}\nManager: ${managerName}`);
-                                setTimeout(actionMenu, 2000);
-                            });
+                                addEmployeeContinue(employeeFirstName, employeeLastName);
+                            };
                         });
-                    }
-                );
-            });
+                    } else {
+                        addEmployeeContinue(employeeFirstName, employeeLastName);
+                    };
+                });
+            })
         }
     );
 };
 
+const addEmployeeContinue = (employeeFirstName, employeeLastName) => {
+    inquirer.prompt([
+        {
+            name: 'employeeRole',
+            type: 'list',
+            message: 'New employee role:',
+            choices: roleTitles
+        }
+    ])
+    .then((answers) => {
+        let employeeRole = answers.employeeRole;
+        let roleId = '';
+        if (answers.employeeRole === 'No existing roles in database') {
+            roleId = null;
+            employeeRole = 'No existing role'
+        } else {
+            for (let i = 0; i < roles.length; i++) {
+                if (roles[i].title === answers.employeeRole) {
+                    roleId = roles[i].id;
+                }
+            }
+        }
+        connection.query(
+            'SELECT * FROM employee', (err, res) => {
+                if (err) throw err;
+                if (res.length > 0) {
+                    if (employeeNames[0] === 'No existing employees in database') {
+                        employeeNames.splice(0, 1);
+                    }
+                    res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
+                        employees.push({id, first_name, last_name, role_id, manager_id});
+                        employeeNames.push(`${id} | ${first_name} ${last_name}`);
+                    });
+                    employeeNames.push('No manager');
+                }
+
+                inquirer.prompt([
+                    {
+                        name: 'employeeManager',
+                        type: 'list',
+                        message: 'New employee manager:',
+                        choices: employeeNames
+                    }
+                ])
+                .then((answer) => {    
+                    let managerId = '';
+                    let splitAnswer = answer.employeeManager.split(' ');
+                    let managerName = '';                      
+                    if (answer.employeeManager === 'No existing employees in database' || answer.employeeManager == 'No manager') {
+                        managerId = null;
+                        managerName = 'No existing manager'
+                    } else {
+                        managerName = splitAnswer.splice(2, splitAnswer.length).join(' ');  
+                        for (let i = 0; i < employees.length; i++) {
+                            if (employees[i].id === parseInt(answer.employeeManager.split(' ')[0])) {
+                                managerId = employees[i].id;
+                            }
+                        }
+                    }
+
+                    query = 'INSERT INTO employee(first_name, last_name, role_id, manager_id) ';
+                    query += `VALUES(?, ?, ?, ?)`
+                    connection.query(query, [employeeFirstName, employeeLastName, roleId, managerId], (err, res) => {
+                        if (err) throw err;
+                        console.log(`Employee successfully added!\nName: ${employeeFirstName} ${employeeLastName}\nRole: ${employeeRole}\nManager: ${managerName}`);
+                        setTimeout(actionMenu, 2000);
+                    });
+                });
+            }
+        );
+    });
+};
 
 // VIEW EMPLOYEE/ROLE/DEPARTMENT MENU 
 const viewMenu = () => {
