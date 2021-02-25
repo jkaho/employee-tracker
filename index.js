@@ -172,43 +172,62 @@ const addRole = () => {
                     name: 'roleTitle',
                     type: 'input',
                     message: 'New role title:'
-                },
-                {
-                    name: 'roleSalary',
-                    type: 'input',
-                    message: 'New role salary:',
-                    validate: validateNum
-                },
-                {
-                    name: 'roleDepartment',
-                    type: 'list',
-                    message: 'New role department:',
-                    choices: departmentNames
                 }
-            ])
-            .then((answers) => {
-                let departmentId = '';
-                let splitAnswer = answers.roleDepartment.split(' ');
-                let departmentName = splitAnswer.splice(2).join(' ').trim();
-                if (answers.roleDepartment === 'No existing departments in database') {
-                    departmentId = null;
-                    departmentName = 'No existing departments in database';
-                } else {
-                    for (let i = 0; i < departments.length; i++) {
-                        if (departments[i].name === departmentName) {
-                            departmentId = departments[i].id;
-                        };
-                    };
-                };
- 
-                connection.query(
-                    `INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)`, [answers.roleTitle.trim(), parseInt(answers.roleSalary), departmentId],
-                    (err, res) => {
-                        if (err) throw err;
-                        console.log(`Role successfully added!\nRole: ${answers.roleTitle.trim()}\nSalary: $${answers.roleSalary}/yr\nDepartment: ${departmentName}`);
-                        setTimeout(actionMenu, 2000);
+            ]).then((answer) => {
+                let roleExists = false;
+                let roleTitle = answer.roleTitle.trim();
+                connection.query('SELECT title FROM role', (err, res) => {
+                    if (err) throw err;
+                    res.forEach((item) => {
+                        if (item.title === roleTitle) {
+                            roleExists = true;
+                        }; 
+                    });
+        
+                    if (roleExists === true) {
+                        console.log(`A role titled '${roleTitle}' already exists.`);
+                        setTimeout(addMenu, 2000);
+                    } else {
+                        inquirer.prompt([
+                            {
+                                name: 'roleSalary',
+                                type: 'input',
+                                message: 'New role salary:',
+                                validate: validateNum
+                            },
+                            {
+                                name: 'roleDepartment',
+                                type: 'list',
+                                message: 'New role department:',
+                                choices: departmentNames
+                            }
+                        ])
+                        .then((answers) => {
+                            let departmentId = '';
+                            let splitAnswer = answers.roleDepartment.split(' ');
+                            let departmentName = splitAnswer.splice(2).join(' ').trim();
+                            if (answers.roleDepartment === 'No existing departments in database') {
+                                departmentId = null;
+                                departmentName = 'No existing departments in database';
+                            } else {
+                                for (let i = 0; i < departments.length; i++) {
+                                    if (departments[i].name === departmentName) {
+                                        departmentId = departments[i].id;
+                                    };
+                                };
+                            };
+             
+                            connection.query(
+                                `INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)`, [roleTitle, parseInt(answers.roleSalary), departmentId],
+                                (err, res) => {
+                                    if (err) throw err;
+                                    console.log(`Role successfully added!\nRole: ${roleTitle}\nSalary: $${answers.roleSalary}/yr\nDepartment: ${departmentName}`);
+                                    setTimeout(actionMenu, 2000);
+                                }
+                            );
+                        });
                     }
-                );
+                });
             });
         }
     );    
