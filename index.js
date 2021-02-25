@@ -1158,8 +1158,8 @@ const deleteEmployee = () => {
     employeeNames = ['No existing employees in database'];
     let query = 'SELECT employee.id, employee.first_name, employee.last_name, department.name ';
     query += 'FROM employee ';
-    query += 'JOIN role ON employee.role_id = role.id ';
-    query += 'JOIN department ON role.department_id = department.id';
+    query += 'LEFT JOIN role ON employee.role_id = role.id ';
+    query += 'LEFT JOIN department ON role.department_id = department.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length < 1) {
