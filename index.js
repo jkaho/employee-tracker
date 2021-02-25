@@ -605,7 +605,7 @@ const viewEmployeeByManagerMenu = () => {
 
 // View employee data by all managers
 const viewEmployeeByManagerAll = () => {
-    let query = 'SELECT B.id AS manager_id, B.first_name AS manager_first, B.last_name AS manager_last, A.id AS employee_id, A.first_name AS employee_first, A.last_name AS employee_last, role.title AS role, role.salary, department.name AS department ';
+    let query = 'SELECT B.first_name AS manager_first, B.last_name AS manager_last, A.id AS employee_id, A.first_name AS employee_first, A.last_name AS employee_last, role.title AS role, role.salary, department.name AS department ';
     query += 'FROM employee A ';
     query += 'LEFT JOIN role ON A.role_id = role.id ';
     query += 'LEFT JOIN department ON role.department_id = department.id ';
@@ -647,7 +647,7 @@ const viewEmployeeByManagerEach = () => {
                 }
             ]).then((answer) => {
                 let managerId = parseInt(answer.managerList.split('|').splice(0, 1).join('').trim());
-                let query = 'SELECT B.id AS manager_id, B.first_name AS manager_first, B.last_name AS manager_last, A.id AS employee_id, A.first_name AS employee_first, A.last_name AS employee_last, role.title AS role, role.salary, department.name AS department ';
+                let query = 'SELECT A.id AS employee_id, A.first_name AS employee_first, A.last_name AS employee_last, role.title AS role, role.salary, department.name AS department ';
                 query += 'FROM employee A ';
                 query += 'LEFT JOIN role ON A.role_id = role.id ';
                 query += 'LEFT JOIN department ON role.department_id = department.id ';
