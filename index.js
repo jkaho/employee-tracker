@@ -58,7 +58,7 @@ const actionMenu = () => {
             case 'Delete data':
                 deleteMenu();
                 break;
-            case 'Exit':
+            case 'Exit application':
                 console.log('Application shutting down...');
                 setTimeout(() => {
                     connection.end();
@@ -541,6 +541,9 @@ const viewEmployeeByDepartmentEach = () => {
             console.log('There are no departments to display.');
             setTimeout(viewMenu, 2000);
         } else {
+            if (departmentNames[0] === 'No existing departments in database') {
+                departmentNames.splice(0, 1);
+            };
             res.forEach((item) => {
                 departmentNames.push(`${item.id} | ${item.name}`);
             });
@@ -1226,7 +1229,8 @@ const updateRoleSalary = (roleId, roleSalary) => {
 
             connection.query(`SELECT salary FROM role WHERE id = ${roleId}`, (err, res) => {
                 if (err) throw err;
-                console.log(`${roleSalary} (previous salary) ---> $${res[0].salary}/yr (updated salary)`)
+                console.log(`${roleSalary} (previous salary) ---> $${res[0].salary}/yr (updated salary)`);
+                setTimeout(updateMenu, 2000);
             });
         });
     });
