@@ -17,7 +17,7 @@ Employee Tracker is a command-line Content Management System (CMS) application t
 1. Clone this repository onto your local computer.
 2. Using the MySQL server, run the 'schema.sql' file to create the application database.
 3. In the command line, navigate to the cloned repository (the 'employee-tracker' directory).
-4. Invoke the application by entering the command: **npm install** 
+4. Install the required dependencies by running the command: **npm install** 
 
 ## Video Walkthrough
 
