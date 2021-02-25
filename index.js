@@ -2,6 +2,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 
 // Database components
 let departments = [];
@@ -497,6 +498,42 @@ const viewDepartments = () => {
             console.log('There is no department data to display.')
         };
         setTimeout(viewMenu, 2000);
+    });
+};
+
+// View department budget
+const viewDepartmentBudget = () => {
+    departmentNames = ['No existing departments in database'];
+    connection.query('SELECT * FROM department', (err, res) => {
+        if (err) throw err;
+        if (res < 1) {
+            console.log('There is no department data to display.');
+            setTimeout(viewMenu, 2000);
+        } else {
+            if (departmentNames[0] === 'No existing departments in database') {
+                departmentNames.splice(0, 1);
+            };
+            res.forEach((item) => {
+                departmentNames.push(`${item.id} | ${item.name}`)
+            });
+
+            inquirer.prompt([
+                {
+                    name: 'departmentName',
+                    type: 'list',
+                    message: 'Select one of the following departments to view budget:',
+                    choices: departmentNames
+                }
+            ]).then((answer) => {
+                let departmentId = parseInt(answer.departmentName.split(' ').splice(0, 1));
+                let departmentName = answer.departmentName.split(' ').splice(2).join(' ').trim();
+
+                connection.query(`SELECT SUM(salary) FROM role WHERE department_id = ${departmentId}`, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                });
+            })
+        };
     });
 };
 
