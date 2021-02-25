@@ -884,8 +884,14 @@ const updateRoleMenu = () => {
     let roleId;
     let roleTitle;
     let roleSalary;
+    let departmentId;
+    let departmentName;
 
-    connection.query('SELECT * FROM role', (err, res) => {
+    let query = 'SELECT role.id, role.title, role.salary, role.department_id, department.name ';
+    query += 'FROM role ';
+    query += 'LEFT JOIN department ON role.department_id = department.id';
+
+    connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length < 1) {
             inquirer.prompt([
@@ -902,9 +908,9 @@ const updateRoleMenu = () => {
             if (roleTitles[0] === 'No existing roles in database') {
                 roleTitles.splice(0, 1);
             }
-            res.forEach(({ id, title, salary, department_id }) => {
+            res.forEach(({ id, title, salary, department_id, name }) => {
                 roles.push({id, title, salary, department_id});
-                roleTitles.push(`${id} | ${title} | $${salary}/yr`);
+                roleTitles.push(`${id} | ${title} | $${salary}/yr | ${name}`);
             });
 
             inquirer.prompt([
@@ -916,42 +922,44 @@ const updateRoleMenu = () => {
                 }
             ])
             .then((answer) => {
-                if (answer.updateRole === 'No existing roles in database') {
-                    updateMenu();
-                } else {
-                    roleId = parseInt(answer.updateRole.split(' ').splice(0));
-                    roleTitle = answer.updateRole.split(' ').splice(2, 1);
-                    roleSalary = answer.updateRole.split(' ').splice(4, 1);
-    
-                    inquirer.prompt([
-                        {
-                            name: 'updateRoleAction',
-                            type: 'list',
-                            message: 'What would you like to update?',
-                            choices: [
-                                'Update title',
-                                'Update salary',
-                                'Update department',
-                                'Go back to update menu'
-                            ]
-                        }
-                    ]).then((answer) => {
-                        switch(answer.updateRoleAction) {
-                            case 'Update title':
-                                updateRoleTitle(roleId, roleTitle);
-                                break;
-                            case 'Update salary':
-                                updateRoleSalary(roleId, roleSalary);
-                                break;
-                            case 'Update department':
-                                updateRoleDepartment(roleId);
-                                break;
-                            default:
-                                updateMenu();
-                                break;
-                        };
-                    });
-                };            
+                roleId = parseInt(answer.updateRole.split('|').splice(0, 1).join('').trim());
+                roleTitle = answer.updateRole.split('|').splice(1, 1).join('').trim();
+                roleSalary = answer.updateRole.split('|').splice(2, 1).join('').trim();
+                departmentName = answer.updateRole.split('|').splice(3, 1).join('').trim();
+                roles.forEach((role) => {
+                    if (role.id === roleId) {
+                        departmentId = role.department_id;
+                    };
+                });
+
+                inquirer.prompt([
+                    {
+                        name: 'updateRoleAction',
+                        type: 'list',
+                        message: 'What would you like to update?',
+                        choices: [
+                            'Update title',
+                            'Update salary',
+                            'Update department',
+                            'Go back to update menu'
+                        ]
+                    }
+                ]).then((answer) => {
+                    switch(answer.updateRoleAction) {
+                        case 'Update title':
+                            updateRoleTitle(roleId, roleTitle);
+                            break;
+                        case 'Update salary':
+                            updateRoleSalary(roleId, roleSalary);
+                            break;
+                        case 'Update department':
+                            updateRoleDepartment(roleId, departmentId, departmentName);
+                            break;
+                        default:
+                            updateMenu();
+                            break;
+                    };
+                });      
             });
         };
     });
@@ -1004,11 +1012,20 @@ const updateRoleSalary = (roleId, roleSalary) => {
 };
 
 // Update role department
-const updateRoleDepartment = (roleId) => {
-    departmentNames = ['No existing departments in database'];
-    connection.query('SELECT * FROM department', (err, res) => {
+const updateRoleDepartment = (roleId, departmentId, departmentName) => {
+    departmentNames = ['There are no existing departments in database'];
+    connection.query(`SELECT * FROM department`, (err, res) => {
         if (err) throw err;
-        if (res.length > 0) {
+        if (res.length < 1) {
+            inquirer.prompt([
+                {
+                    name: 'noDepartments',
+                    type: 'list',
+                    message: 'There are no existing departments in the database...',
+                    choices: ['Go back to update menu']
+                }
+            ]).then(() => updateMenu());
+        } else {
             if (departmentNames[0] === 'No existing departments in database') {
                 departmentNames.splice(0, 1);
             };
@@ -1021,24 +1038,20 @@ const updateRoleDepartment = (roleId) => {
             {
                 name: 'updateRoleDepartment',
                 type: 'list', 
+            type: 'list', 
+                type: 'list', 
                 message: 'Select new department for role:',
                 choices: departmentNames
             }
         ])
         .then((answer) => {
-            let departmentId = parseInt(answer.updateRoleDepartment.split(' ').splice(0));
-            let departmentName  = answer.updateRoleDepartment.split(' ').splice(2);
+            updatedDepartmentId = parseInt(answer.updateRoleDepartment.split(' ').splice(0));
+            updatedDepartmentName  = answer.updateRoleDepartment.split(' ').splice(2);
             connection.query(`UPDATE role SET department_id = ${departmentId} WHERE id = ${roleId}`, (err, res) => {
                 if (err) throw err;
-                console.log(`Role (id: ${roleId}) department successfully updated!`);
-                connection.query(`SELECT name FROM department WHERE id = ${departmentId}`, (err, res) => {
-                    if (err) throw err;
-                    console.log(`${departmentName} (previous department) ---> ${res[0].name} (updated department)`);
-
-                    setTimeout(updateMenu, 2000);
-                });
-            });
-            
+                console.log(`Role (id: ${roleId}) department successfully updated!\n${departmentName} (previous department) ---> ${updatedDepartmentName} (updated department)`);
+                setTimeout(updateMenu, 2000);
+            }); 
         });
     });
 };
