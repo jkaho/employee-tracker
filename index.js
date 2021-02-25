@@ -1162,14 +1162,7 @@ const deleteEmployee = () => {
     query += 'JOIN department ON role.department_id = department.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        if (res.length > 0) {
-            if (employeeNames[0] === 'No existing employees in database') {
-                employeeNames.splice(0, 1);
-            };
-            res.forEach((item) => {
-                employeeNames.push(`${item.id} | ${item.first_name} ${item.last_name} | ${item.name}`)
-            });
-        } else {
+        if (res.length < 1) {
             inquirer.prompt([
                 {
                     name: 'noEmployees',
@@ -1177,99 +1170,106 @@ const deleteEmployee = () => {
                     message: 'There are no existing employees in the database...',
                     choices: ['Go back to delete menu']
                 }
-            ]).then(deleteMenu());
-        };
+            ]).then(() => deleteMenu());
+        } else {
+            if (employeeNames[0] === 'No existing employees in database') {
+                employeeNames.splice(0, 1);
+            };
+            res.forEach((item) => {
+                employeeNames.push(`${item.id} | ${item.first_name} ${item.last_name} | ${item.name}`)
+            });
 
-        inquirer.prompt([
-            {
-                name: 'inputOrView',
-                type: 'list',
-                message: 'Select one of the following:',
-                choices: [
-                    'Find employee by id',
-                    'View all employees'
-                ]
-            }
-        ])
-        .then((answer) => {
-            switch(answer.inputOrView) {
-                case 'Find employee by id':
-                    inquirer.prompt([
-                        {
-                            name: 'employeeId',
-                            type: 'input',
-                            message: 'Employee id:'
-                        }
-                    ])
-                    .then((answer) => {
-                        let employeeId = parseInt(answer.employeeId);
-                        connection.query(`SELECT first_name, last_name FROM employee WHERE id = ${employeeId}`, (err, res) => {
-                            if (err) throw err;
-                            if (res.length < 1) {
-                                console.log(`Sorry! No employees with the id ${employeeId} found in the database.`);
-                                setTimeout(deleteMenu, 2000);
-                            } else {
-                                let name = `${res[0].first_name} ${res[0].last_name}`;
-                                inquirer.prompt([
-                                    {
-                                        name: 'confirmation',
-                                        type: 'confirm',
-                                        message: `Are you sure you want to delete employee '${name}' (id: ${employeeId})?` 
-                                    }
-                                ])
-                                .then((answer) => {
-                                    if (answer.confirmation === true) {
-                                        connection.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, res) => {
-                                            if (err) throw err;
-                                            console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
-                                            setTimeout(deleteMenu, 2000);
-                                        });
-                                    } else {
-                                        deleteMenu();
-                                    };
-                                });
-                            };
-                        });
-                    });
-                    break;
-                case 'View all employees':
-                    inquirer.prompt([
-                        {
-                            name: 'employeeList',
-                            type: 'list',
-                            message: 'Select an employee to delete from the list:',
-                            choices: employeeNames
-                        }
-                    ])
-                    .then((answer) => {
-                        let name = answer.employeeList.split(' ').slice(2, answer.employeeList.split(' ').length - 2).join(' ').trim();
-                        let employeeId = parseInt(answer.employeeList.split(' ').splice(0, 1));
-
+            inquirer.prompt([
+                {
+                    name: 'inputOrView',
+                    type: 'list',
+                    message: 'Select one of the following:',
+                    choices: [
+                        'Find employee by id',
+                        'View all employees'
+                    ]
+                }
+            ])
+            .then((answer) => {
+                switch(answer.inputOrView) {
+                    case 'Find employee by id':
                         inquirer.prompt([
                             {
-                                name: 'confirmation',
-                                type: 'confirm', 
-                                message: `Are you sure you want to delete employee '${name}' (id: ${employeeId})?`
+                                name: 'employeeId',
+                                type: 'input',
+                                message: 'Employee id:'
                             }
                         ])
                         .then((answer) => {
-                            if (answer.confirmation === true) {
-                                connection.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, res) => {
-                                    if (err) throw err;
-                                    console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
+                            let employeeId = parseInt(answer.employeeId);
+                            connection.query(`SELECT first_name, last_name FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                                if (err) throw err;
+                                if (res.length < 1) {
+                                    console.log(`Sorry! No employees with the id ${employeeId} found in the database.`);
                                     setTimeout(deleteMenu, 2000);
-                                });
-                            } else {
-                                deleteMenu();
-                            };
+                                } else {
+                                    let name = `${res[0].first_name} ${res[0].last_name}`;
+                                    inquirer.prompt([
+                                        {
+                                            name: 'confirmation',
+                                            type: 'confirm',
+                                            message: `Are you sure you want to delete employee '${name}' (id: ${employeeId})?` 
+                                        }
+                                    ])
+                                    .then((answer) => {
+                                        if (answer.confirmation === true) {
+                                            connection.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                                                if (err) throw err;
+                                                console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
+                                                setTimeout(deleteMenu, 2000);
+                                            });
+                                        } else {
+                                            deleteMenu();
+                                        };
+                                    });
+                                };
+                            });
                         });
-                    });
-                    break;
-                default:
-                    deleteMenu();
-                    break;
-            };
-        });
+                        break;
+                    case 'View all employees':
+                        inquirer.prompt([
+                            {
+                                name: 'employeeList',
+                                type: 'list',
+                                message: 'Select an employee to delete from the list:',
+                                choices: employeeNames
+                            }
+                        ])
+                        .then((answer) => {
+                            let name = answer.employeeList.split(' ').slice(2, answer.employeeList.split(' ').length - 2).join(' ').trim();
+                            let employeeId = parseInt(answer.employeeList.split(' ').splice(0, 1));
+    
+                            inquirer.prompt([
+                                {
+                                    name: 'confirmation',
+                                    type: 'confirm', 
+                                    message: `Are you sure you want to delete employee '${name}' (id: ${employeeId})?`
+                                }
+                            ])
+                            .then((answer) => {
+                                if (answer.confirmation === true) {
+                                    connection.query(`DELETE FROM employee WHERE id = ${employeeId}`, (err, res) => {
+                                        if (err) throw err;
+                                        console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
+                                        setTimeout(deleteMenu, 2000);
+                                    });
+                                } else {
+                                    deleteMenu();
+                                };
+                            });
+                        });
+                        break;
+                    default:
+                        deleteMenu();
+                        break;
+                };
+            });
+        };
     });
 };
 
