@@ -1580,10 +1580,23 @@ const deleteDepartment = () => {
             let departmentId = parseInt(answer.deleteDepartment.split(' ').splice(0, 1));
             let departmentName = answer.deleteDepartment.split(' ').slice(2).join(' ').trim();
 
-            connection.query(`DELETE FROM department WHERE id = ${departmentId}`, (err, res) => {
-                if (err) throw err;
-                console.log(`Department ('${departmentName}', id: ${departmentId}) successfully deleted.`);
-                setTimeout(deleteMenu, 2000);
+            inquirer.prompt([
+                {
+                    name: 'deleteConfirm',
+                    type: 'confirm',
+                    message: `Are you sure you want to delete the department '${departmentName}'?`
+                }
+            ]).then((answer) => {
+                if (answer.deleteConfirm === true) {
+                    connection.query(`DELETE FROM department WHERE id = ${departmentId}`, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Department ('${departmentName}', id: ${departmentId}) successfully deleted.`);
+                        setTimeout(deleteMenu, 2000);
+                    });
+                } else {
+                    console.log('Action cancelled. Returning to delete menu...');
+                    setTimeout(deleteMenu, 2000);
+                };
             });
         });
     });
