@@ -111,18 +111,33 @@ const addDepartment = () => {
         {
             name: 'departmentName',
             type: 'input',
-            message: 'New department name:'
+            message: 'New department name:',
         }
     ])
     .then((answer) => {
-        connection.query(
-            `INSERT INTO department(name) VALUES(?)`, [answer.departmentName.trim()],
-            (err, res) => {
-                if (err) throw err;
-                console.log(`'${answer.departmentName.trim()}' department successfully added to database!`);
-                setTimeout(actionMenu, 2000);
+        let departmentExists = false;
+        connection.query('SELECT name FROM department', (err, res) => {
+            if (err) throw err;
+            res.forEach((item) => {
+                if (item.name === answer.departmentName.trim()) {
+                    departmentExists = true;
+                }; 
+            });
+
+            if (departmentExists === true) {
+                console.log(`A department named '${answer.departmentName.trim()}' already exists.`);
+                setTimeout(addMenu, 2000);
+            } else {
+                connection.query(
+                    `INSERT INTO department(name) VALUES(?)`, [answer.departmentName.trim()],
+                    (err, res) => {
+                        if (err) throw err;
+                        console.log(`'${answer.departmentName.trim()}' department successfully added to database!`);
+                        setTimeout(actionMenu, 2000);
+                    }
+                );
             }
-        );
+        });
     });
 };
 
