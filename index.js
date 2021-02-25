@@ -179,7 +179,7 @@ const addRole = () => {
                 }
  
                 connection.query(
-                    `INSERT INTO role(title, salary, department_id) VALUES ('${answers.roleTitle}', '${answers.roleSalary}', '${departmentId}')`, (err, res) => {
+                    `INSERT INTO role(title, salary, department_id) VALUES ('${answers.roleTitle}', ${answers.roleSalary}, ${departmentId})`, (err, res) => {
                         if (err) throw err;
                         console.log(`Role successfully added!\nRole: ${answers.roleTitle}\nSalary: ${answers.roleSalary}\nDepartment: ${departmentName}`);
                         setTimeout(actionMenu, 2000);
