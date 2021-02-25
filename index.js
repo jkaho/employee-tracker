@@ -349,7 +349,6 @@ const viewEmployeeMenu = () => {
     ])
     .then((answer) => {
         // Continue to functions
-        console.log(answer.viewEmployees)
         switch(answer.viewEmployees) {
             case 'View all':
                 viewEmployeeAll();
@@ -377,6 +376,53 @@ const viewEmployeeAll = () => {
     query += 'LEFT JOIN role ON A.role_id = role.id ';
     query += 'LEFT JOIN department ON role.id = department.id ';
     query += 'LEFT JOIN employee B ON A.manager_id = B.id';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        if (res.length > 1) {
+            console.table(res);
+        } else {
+            console.log('There is no employee data to display.')
+        };
+        setTimeout(viewMenu, 2000);
+    });
+};
+
+// VIEW EMPLOYEE BY ROLE MENU 
+const viewEmployeeByRoleMenu = () => {
+    inquirer.prompt([
+        {
+            name: 'allOrEach',
+            type: 'list',
+            message: 'How would you like to view employees?',
+            choices: [
+                'View by all roles',
+                'View by individual role',
+                'Go back to view employee menu'
+            ]
+        }
+    ]).then((answer) => {
+        switch(answer.allOrEach) {
+            case 'View by all roles':
+                viewEmployeeByRoleAll();
+                break;
+            case 'View by individual role':
+                viewEmployeeByRoleEach();
+                break;
+            default:
+                viewEmployeeMenu();
+                break;
+        };
+    });
+};
+
+// View employee data by all roles
+const viewEmployeeByRoleAll = () => {
+    let query = 'SELECT role.title AS role, A.id, A.first_name, A.last_name, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
+    query += 'FROM employee A ';
+    query += 'LEFT JOIN role ON A.role_id = role.id ';
+    query += 'LEFT JOIN department ON role.id = department.id ';
+    query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
+    query += 'ORDER BY role';
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length > 1) {
@@ -419,30 +465,15 @@ const viewEmployeeByRoleEach = () => {
                 query += `WHERE role.id = ${roleId}`;
                 connection.query(query, (err, res) => {
                     if (err) throw err;
-                    console.log(res);
+                    if (res.length < 1) {
+                        console.log('There is no employee data for this role.');
+                    } else {
+                        console.table(res);
+                    }
                     setTimeout(viewMenu, 2000);
                 });
             });
         };
-    });
-};
-
-// View employee data by all roles
-const viewEmployeeByRoleAll = () => {
-    let query = 'SELECT role.title AS role, A.id, A.first_name, A.last_name, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
-    query += 'FROM employee A ';
-    query += 'LEFT JOIN role ON A.role_id = role.id ';
-    query += 'LEFT JOIN department ON role.id = department.id ';
-    query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
-    query += 'ORDER BY role';
-    connection.query(query, (err, res) => {
-        if (err) throw err;
-        if (res.length > 1) {
-            console.table(res);
-        } else {
-            console.log('There is no employee data to display.')
-        };
-        setTimeout(viewMenu, 2000);
     });
 };
 
