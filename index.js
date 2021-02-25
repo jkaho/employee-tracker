@@ -670,7 +670,9 @@ const viewEmployeeByManagerEach = () => {
 
 // View roles
 const viewRoles = () => {
-    let query = 'SELECT * FROM role';
+    let query = 'SELECT role.id, role.title, role.salary, department.name AS department ';
+    query += 'FROM role ';
+    query += 'LEFT JOIN department ON role.department_id = department.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length > 1) {
