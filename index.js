@@ -2,7 +2,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const { connect } = require('http2');
 
 // Database components
 let departments = [];
@@ -322,7 +321,7 @@ const viewMenu = () => {
                 viewRoles();
                 break;
             case 'View departments':
-                viewDepartments();
+                viewDepartmentMenu();
                 break;
             default:
                 actionMenu();
@@ -459,7 +458,35 @@ const viewRoles = () => {
     });
 };
 
-// View departments
+// VIEW DEPARTMENT MENU 
+const viewDepartmentMenu = () => {
+    inquirer.prompt([
+        {
+            name: 'viewDepartmentAction',
+            type: 'list', 
+            message: 'What would you like to view?',
+            choices: [
+                'View all departments',
+                'View total utilized budget of a department',
+                'Go back to view menu'
+            ]
+        }
+    ]).then((answer) => {
+        switch(answer.viewDepartmentAction) {
+            case 'View all departments':
+                viewDepartments();
+                break;
+            case 'View total utilized budget of a department':
+                viewDepartmentBudget();
+                break;
+            default: 
+                viewMenu();
+                break;
+        };
+    });
+};
+
+// View all departments
 const viewDepartments = () => {
     let query = 'SELECT * FROM department';
     connection.query(query, (err, res) => {
