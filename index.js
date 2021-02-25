@@ -116,7 +116,7 @@ const addDepartment = () => {
     ])
     .then((answer) => {
         connection.query(
-            `INSERT INTO department(name) VALUES('${answer.departmentName}')`,
+            `INSERT INTO department(name) VALUES(?)`, [answer.departmentName],
             (err, res) => {
                 if (err) throw err;
                 console.log(`'${answer.departmentName}' department successfully added to database!`);
@@ -187,9 +187,10 @@ const addRole = () => {
                 };
  
                 connection.query(
-                    `INSERT INTO role(title, salary, department_id) VALUES ('${answers.roleTitle}', ${answers.roleSalary}, ${departmentId})`, (err, res) => {
+                    `INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)`, [answers.roleTitle, parseInt(answers.roleSalary), departmentId],
+                    (err, res) => {
                         if (err) throw err;
-                        console.log(`Role successfully added!\nRole: ${answers.roleTitle}\nSalary: ${answers.roleSalary}\nDepartment: ${departmentName}`);
+                        console.log(`Role successfully added!\nRole: ${answers.roleTitle}\nSalary: $${answers.roleSalary}/yr\nDepartment: ${departmentName}`);
                         setTimeout(actionMenu, 2000);
                     }
                 );
@@ -290,8 +291,8 @@ const addEmployee = () => {
                             }
 
                             query = 'INSERT INTO employee(first_name, last_name, role_id, manager_id) ';
-                            query += `VALUES('${employeeFirstName}', '${employeeLastName}', ${roleId}, ${managerId})`
-                            connection.query(query, (err, res) => {
+                            query += `VALUES(?, ?, ?, ?)`
+                            connection.query(query, [employeeFirstName, employeeLastName, roleId, managerId], (err, res) => {
                                 if (err) throw err;
                                 console.log(`Employee successfully added!\nName: ${employeeFirstName} ${employeeLastName}\nRole: ${employeeRole}\nManager: ${managerName}`);
                                 setTimeout(actionMenu, 2000);
