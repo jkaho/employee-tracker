@@ -582,10 +582,10 @@ const viewEmployeeByManagerMenu = () => {
         }
     ]).then((answer) => {
         switch(answer.allOrEach) {
-            case 'View by all departments':
+            case 'View by all managers':
                 viewEmployeeByManagerAll();
                 break;
-            case 'View by individual department':
+            case 'View by individual manager':
                 viewEmployeeByManagerEach();
                 break;
             default:
@@ -605,12 +605,54 @@ const viewEmployeeByManagerAll = () => {
     query += 'ORDER BY A.manager_id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        if (res.length > 1) {
+        if (res.length > 0) {
             console.table(res);
         } else {
-            console.log('There is no employee data to display.')
+            console.log('There are no managers.')
         };
         setTimeout(viewMenu, 2000);
+    });
+};
+
+// View employee by individual manager
+const viewEmployeeByManagerEach = () => {
+    let managers = [];
+    let query = 'SELECT B.id AS manager_id, B.first_name AS manager_first, B.last_name AS manager_last ';
+    query += 'FROM employee A ';
+    query += 'JOIN employee B ON A.manager_id = B.id';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        if (res.length < 1) {
+            console.log('There are no managers.');
+            setTimeout(viewMenu, 2000);
+        } else {
+            res.forEach((item) => {
+                managers.push(`${item.manager_id} | ${item.manager_first} ${item.manager_last}`);
+            });
+    
+            inquirer.prompt([
+                {
+                    name: 'managerList',
+                    type: 'list',
+                    message: 'Select a manager to view employees:',
+                    choices: managers
+                }
+            ]).then((answer) => {
+                let managerId = parseInt(answer.managerList.split('|').splice(0, 1).join('').trim());
+                let query = 'SELECT B.id AS manager_id, B.first_name AS manager_first, B.last_name AS manager_last, A.id AS employee_id, A.first_name AS employee_first, A.last_name AS employee_last, role.title AS role, role.salary, department.name AS department ';
+                query += 'FROM employee A ';
+                query += 'LEFT JOIN role ON A.role_id = role.id ';
+                query += 'LEFT JOIN department ON role.department_id = department.id ';
+                query += 'JOIN employee B ON A.manager_id = B.id ';
+                query += `WHERE B.id = ${managerId} `;
+                query += 'ORDER BY A.manager_id';
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    console.table(res);
+                    setTimeout(viewMenu, 2000);
+                });
+            });
+        };
     });
 };
 
