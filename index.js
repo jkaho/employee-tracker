@@ -935,6 +935,7 @@ const updateEmployeeMenu = () => {
                                 name: 'employee',
                                 type: 'input',
                                 message: 'What is the id of the employee you would like to update?',
+                                validate: validateNum
                             }
                         ]).then((answer) => updateEmployeePromise(answer));
                         break;
