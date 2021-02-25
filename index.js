@@ -34,13 +34,13 @@ const actionMenu = () => {
         {
             name: 'action',
             type: 'list',
-            message: '----------MENU----------\nWhat would you like to do?',
+            message: '----------MAIN MENU----------\nWhat would you like to do?',
             choices: [
                 'Add data',
                 'View data',
                 'Update data',
                 'Delete data',
-                'Exit'
+                'Exit application'
             ]
         }
     ])
@@ -83,7 +83,7 @@ const addMenu = () => {
                 'Add an employee',
                 'Add a role',
                 'Add a department',
-                'Go back'
+                'Go back to main menu'
             ]
         }
     ])
@@ -174,9 +174,9 @@ const addRole = () => {
                     for (let i = 0; i < departments.length; i++) {
                         if (departments[i].name === departmentName) {
                             departmentId = departments[i].id;
-                        }
-                    }
-                }
+                        };
+                    };
+                };
  
                 connection.query(
                     `INSERT INTO role(title, salary, department_id) VALUES ('${answers.roleTitle}', ${answers.roleSalary}, ${departmentId})`, (err, res) => {
@@ -308,7 +308,7 @@ const viewMenu = () => {
                 'View employees',
                 'View roles',
                 'View departments',
-                'Go back'
+                'Go back to main menu'
             ]
         }
     ])
@@ -343,7 +343,7 @@ const viewEmployeeMenu = () => {
                 'View by role',
                 'View by department',
                 'View by manager',
-                'Go back'
+                'Go back to view menu'
             ]
         }
     ])
@@ -365,7 +365,7 @@ const viewEmployeeMenu = () => {
             default:
                 viewMenu();
                 break;
-        }
+        };
     });
 };
 
@@ -703,7 +703,7 @@ const viewDepartments = () => {
     let query = 'SELECT * FROM department';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        if (res.length > 1) {
+        if (res.length > 0) {
             console.table(res);
         } else {
             console.log('There is no department data to display.')
@@ -717,7 +717,7 @@ const viewDepartmentBudget = () => {
     departmentNames = ['No existing departments in database'];
     connection.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;
-        if (res < 1) {
+        if (res.length < 1) {
             console.log('There is no department data to display.');
             setTimeout(viewMenu, 2000);
         } else {
@@ -744,7 +744,7 @@ const viewDepartmentBudget = () => {
                     console.table(res);
                     setTimeout(viewMenu, 2000);
                 });
-            })
+            });
         };
     });
 };
@@ -760,7 +760,7 @@ const updateMenu = () => {
                 'Update an employee',
                 'Update a role',
                 'Update a department',
-                'Go back'
+                'Go back to main menu'
             ]
         }
     ])
@@ -779,7 +779,7 @@ const updateMenu = () => {
             default:
                 actionMenu();
                 break;
-        }
+        };
     });
 };
 
@@ -845,7 +845,7 @@ const updateEmployeeMenu = () => {
                                     'Employee name',
                                     'Employee role',
                                     'Employee manager',
-                                    'Go back'
+                                    'Go back to update menu'
                                 ]
                             }
                         ])
@@ -905,7 +905,8 @@ const updateEmployeeMenu = () => {
                     message: 'Select one of the following:',
                     choices: [
                         'Find employee by id',
-                        'View all employees'
+                        'View all employees',
+                        'Go back to update menu'
                     ]
                 }
             ]).then((answer) => {
@@ -1250,8 +1251,6 @@ const updateRoleDepartment = (roleId, departmentId, departmentName) => {
             {
                 name: 'updateRoleDepartment',
                 type: 'list', 
-            type: 'list', 
-                type: 'list', 
                 message: 'Select new department for role:',
                 choices: departmentNames
             }
@@ -1321,7 +1320,6 @@ const updateDepartment = () => {
                         setTimeout(updateMenu, 2000);
                     });
                 });
-                
             });
         };
     });
@@ -1339,7 +1337,7 @@ const deleteMenu = () => {
                 'Delete a role',
                 'Delete a department',
                 'Delete ALL data',
-                'Go back'
+                'Go back to main menu'
             ]
         }
     ])
@@ -1398,7 +1396,8 @@ const deleteEmployee = () => {
                     message: 'Select one of the following:',
                     choices: [
                         'Find employee by id',
-                        'View all employees'
+                        'View all employees',
+                        'Go back to delete menu'
                     ]
                 }
             ])
@@ -1523,13 +1522,25 @@ const deleteRole = () => {
         .then((answer) => {
             let roleId = parseInt(answer.deleteRole.split(' ').splice(0, 1));
             let roleName = answer.deleteRole.split(' ').slice(2, answer.deleteRole.split(' ').length - 4).join(' ').trim();
-
-            connection.query(`DELETE FROM role WHERE id = ${roleId}`, (err, res) => {
-                if (err) throw err;
-                console.log(`Role ('${roleName}', id: ${roleId}) successfully deleted.`);
-                setTimeout(deleteMenu, 2000);
+            inquirer.prompt([
+                {
+                    name: 'deleteConfirm',
+                    type: 'confirm',
+                    message: `Are you sure you want to delete the role '${roleName}'?`
+                }
+            ]).then((answer) => {
+                if (answer.deleteConfirm === true) {
+                    connection.query(`DELETE FROM role WHERE id = ${roleId}`, (err, res) => {
+                        if (err) throw err;
+                        console.log(`Role ('${roleName}', id: ${roleId}) successfully deleted.`);
+                        setTimeout(deleteMenu, 2000);
+                    });
+                } else {
+                    console.log('Action cancelled. Returning to delete menu...');
+                    setTimeout(deleteMenu, 2000);
+                };
             });
-        })
+        });
     });
 };
 
