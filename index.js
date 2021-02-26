@@ -38,7 +38,7 @@ const mainMenu = () => {
         }
     ])
     .then((answer) => {
-        // Continue to next menu
+        // Continues to next menu
         switch(answer.action) {
             case 'Add data':
                 addMenu();
@@ -81,7 +81,7 @@ const addMenu = () => {
         }
     ])
     .then((answer) => {
-        // Continue to functions
+        // Continues to functions
         switch(answer.addAction) {
             case 'Add an employee':
                 addEmployee();
@@ -99,7 +99,7 @@ const addMenu = () => {
     });
 };
 
-// Function for adding a department
+// Adds a department to the database
 const addDepartment = () => {
     inquirer.prompt([
         {
@@ -112,9 +112,9 @@ const addDepartment = () => {
         let departmentExists = false;
         connection.query('SELECT name FROM department', (err, res) => {
             if (err) throw err;
-            res.forEach((item) => {
+            res.forEach((item) => { // Prevents user from creating departments with the same name
                 if (item.name === answer.departmentName.trim()) {
-                    departmentExists = true;
+                    departmentExists = true; 
                 }; 
             });
 
@@ -135,7 +135,7 @@ const addDepartment = () => {
     });
 };
 
-// Validation for numeric inputs
+// Validation for numeric inputs (role salary, ids)
 const validateNum = (num) => {
     if (/^[0-9]+$/.test(num)) {
         return true;
@@ -143,7 +143,7 @@ const validateNum = (num) => {
     return 'Invalid input. Only numeric values are accepted.'
 };
 
-// Function for adding a role
+// Adds a role to the database
 const addRole = () => {
     let departments = [];
     let departmentNames = ['No existing departments in database'];
@@ -172,13 +172,13 @@ const addRole = () => {
                 let roleTitle = answer.roleTitle.trim();
                 connection.query('SELECT title FROM role', (err, res) => {
                     if (err) throw err;
-                    res.forEach((item) => {
+                    res.forEach((item) => { // Prevents user from creating roles with the same title
                         if (item.title === roleTitle) {
-                            roleExists = true;
+                            roleExists = true; 
                         }; 
                     });
-        
-                    if (roleExists === true) {
+                    
+                    if (roleExists === true) { 
                         console.log(`A role titled '${roleTitle}' already exists.`);
                         setTimeout(addMenu, 1000);
                     } else {
@@ -227,7 +227,7 @@ const addRole = () => {
     );    
 };
 
-// Function for adding an employee
+// Adds an employee to the database 
 const addEmployee = () => {
     let roles = [];
     let roleTitles = ['No existing roles in database'];
@@ -265,7 +265,7 @@ const addEmployee = () => {
                 let employeeName = `${employeeFirstName} ${employeeLastName}`;
                 connection.query('SELECT first_name, last_name FROM employee', (err, res) => {
                     if (err) throw err;
-                    res.forEach((item) => {
+                    res.forEach((item) => { // Warns user if an employee with the inputted name already exists
                         if (`${item.first_name} ${item.last_name}` === employeeName) {
                             employeeExists = true;
                         }; 
@@ -313,9 +313,9 @@ const addEmployeeContinue = (employees, employeeNames, employeeFirstName, employ
             for (let i = 0; i < roles.length; i++) {
                 if (roles[i].title === answers.employeeRole) {
                     roleId = roles[i].id;
-                }
-            }
-        }
+                };
+            };
+        };
         connection.query(
             'SELECT * FROM employee', (err, res) => {
                 if (err) throw err;
@@ -328,7 +328,7 @@ const addEmployeeContinue = (employees, employeeNames, employeeFirstName, employ
                         employeeNames.push(`${id} | ${first_name} ${last_name}`);
                     });
                     employeeNames.push('No manager');
-                }
+                };
 
                 inquirer.prompt([
                     {
@@ -350,9 +350,9 @@ const addEmployeeContinue = (employees, employeeNames, employeeFirstName, employ
                         for (let i = 0; i < employees.length; i++) {
                             if (employees[i].id === parseInt(answer.employeeManager.split(' ')[0])) {
                                 managerId = employees[i].id;
-                            }
-                        }
-                    }
+                            };
+                        };
+                    };
 
                     query = 'INSERT INTO employee(first_name, last_name, role_id, manager_id) ';
                     query += `VALUES(?, ?, ?, ?)`
@@ -383,7 +383,7 @@ const viewMenu = () => {
         }
     ])
     .then((answer) => {
-        // Continue to functions
+        // Continues to menus/functions
         switch(answer.viewAction) {
             case 'View employees':
                 viewEmployeeMenu();
@@ -418,7 +418,7 @@ const viewEmployeeMenu = () => {
         }
     ])
     .then((answer) => {
-        // Continue to functions
+        // Continues to menus/functions
         switch(answer.viewEmployees) {
             case 'View all employees':
                 viewEmployeeAll();
@@ -440,7 +440,7 @@ const viewEmployeeMenu = () => {
     
 };
 
-// View all employee data 
+// Displays all employee data
 const viewEmployeeAll = () => {
     let query = 'SELECT A.id, A.first_name, A.last_name, role.title AS role, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
@@ -483,6 +483,7 @@ const viewEmployeeByRoleMenu = () => {
                     ]
                 }
             ]).then((answer) => {
+                // Continues to functions
                 switch(answer.allOrEach) {
                     case 'View by all roles':
                         viewEmployeeByRoleAll();
@@ -499,9 +500,8 @@ const viewEmployeeByRoleMenu = () => {
     });
 };
 
-// View employee data by all roles
+// Displays employee data by all roles (only shows employees with a role)
 const viewEmployeeByRoleAll = () => {
-    // query ALL roles to see if there are any --> test w/ employee with no role
     let query = 'SELECT role.title AS role, A.id, A.first_name, A.last_name, role.salary, department.name AS department, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
     query += 'JOIN role ON A.role_id = role.id ';
@@ -519,7 +519,7 @@ const viewEmployeeByRoleAll = () => {
     });
 };
 
-// View employee data by each role
+// Displays employee data by individual roles 
 const viewEmployeeByRoleEach = (roleTitles) => {
     inquirer.prompt([
         {
@@ -577,6 +577,7 @@ const viewEmployeeByDepartmentMenu = () => {
                     ]
                 }
             ]).then((answer) => {
+                // Continues to functions
                 switch(answer.allOrEach) {
                     case 'View by all departments':
                         viewEmployeeByDepartmentAll();
@@ -593,7 +594,7 @@ const viewEmployeeByDepartmentMenu = () => {
     });
 };
 
-// View employee data by all departments
+// Displays employees by all departments (only displays employees who belong to a department)
 const viewEmployeeByDepartmentAll = () => {
     let query = 'SELECT department.name AS department, A.id, A.first_name, A.last_name, role.title AS role, role.salary, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
@@ -612,7 +613,7 @@ const viewEmployeeByDepartmentAll = () => {
     });
 };
 
-// View employee data by each department
+// Displays employees by individual departments
 const viewEmployeeByDepartmentEach = (departmentNames) => {
     inquirer.prompt([
         {
@@ -655,6 +656,7 @@ const viewEmployeeByManagerMenu = () => {
             ]
         }
     ]).then((answer) => {
+        // Continues to functions
         switch(answer.allOrEach) {
             case 'View by all managers':
                 viewEmployeeByManagerAll();
@@ -669,7 +671,7 @@ const viewEmployeeByManagerMenu = () => {
     });
 };
 
-// View employee data by all managers
+// Displays employees by all managers (only displays employees who have a manager)
 const viewEmployeeByManagerAll = () => {
     let query = 'SELECT B.first_name AS manager_first, B.last_name AS manager_last, A.id AS employee_id, A.first_name AS employee_first, A.last_name AS employee_last, role.title AS role, role.salary, department.name AS department ';
     query += 'FROM employee A ';
@@ -688,7 +690,7 @@ const viewEmployeeByManagerAll = () => {
     });
 };
 
-// View employee by individual manager
+// Displays employees by individual managers
 const viewEmployeeByManagerEach = () => {
     let managers = [];
     let query = 'SELECT B.id AS manager_id, B.first_name AS manager_first, B.last_name AS manager_last ';
@@ -730,7 +732,7 @@ const viewEmployeeByManagerEach = () => {
     });
 };
 
-// View roles
+// Displays all roles
 const viewRoles = () => {
     let query = 'SELECT role.id, role.title, role.salary, department.name AS department ';
     query += 'FROM role ';
@@ -760,6 +762,7 @@ const viewDepartmentMenu = () => {
             ]
         }
     ]).then((answer) => {
+        // Continues to functions
         switch(answer.viewDepartmentAction) {
             case 'View all departments':
                 viewDepartments();
@@ -774,7 +777,7 @@ const viewDepartmentMenu = () => {
     });
 };
 
-// View all departments
+// Displays all departments
 const viewDepartments = () => {
     let query = 'SELECT * FROM department';
     connection.query(query, (err, res) => {
@@ -788,7 +791,7 @@ const viewDepartments = () => {
     });
 };
 
-// View department budget
+// Displays total utilized budget of individual departments
 const viewDepartmentBudget = () => {
     let departmentNames = ['No existing departments in database'];
     connection.query('SELECT * FROM department', (err, res) => {
@@ -1023,7 +1026,7 @@ const updateEmployeeMenu = () => {
     });
 };
 
-// Update employee name 
+// Updates an employee's name
 const updateEmployeeName = (employeeId, employee, employees) => {
     inquirer.prompt([
         {
@@ -1079,7 +1082,7 @@ const updateEmployeePromise = (updatedFirstName, updatedLastName, updatedName, e
     });
 };
 
-// Update employee role 
+// Updates an employee's role 
 const updateEmployeeRole = (employeeId, employee, employeeRole) => {
     let roles = [];
     let roleTitles = ['No existing roles in database'];
@@ -1135,7 +1138,7 @@ const updateEmployeeRole = (employeeId, employee, employeeRole) => {
     );
 };
 
-// Update employee manager
+// Updates an employee's manager
 const updateEmployeeManager = (employeeId, managerId, managerName) => {
     let employees = [];
     let employeeNames = ['No existing employees in database'];
@@ -1285,7 +1288,7 @@ const updateRoleMenu = () => {
     });
 };
 
-// Update role title
+// Updates a role's title
 const updateRoleTitle = (roleId, roleTitle, roles) => {
     inquirer.prompt([
         {
@@ -1317,7 +1320,7 @@ const updateRoleTitle = (roleId, roleTitle, roles) => {
     });
 };
 
-// Update role salary
+// Updates a role's salary
 const updateRoleSalary = (roleId, roleSalary) => {
     inquirer.prompt([
         {
@@ -1337,7 +1340,7 @@ const updateRoleSalary = (roleId, roleSalary) => {
     });
 };
 
-// Update role department
+// Updates a role's department
 const updateRoleDepartment = (roleId, departmentName) => {
     let departmentNames = ['No existing departments in database'];
     connection.query(`SELECT * FROM department`, (err, res) => {
@@ -1380,7 +1383,7 @@ const updateRoleDepartment = (roleId, departmentName) => {
     });
 };
 
-// Update department name
+// Updates a department's name
 const updateDepartment = () => {
     let departments = [];
     let departmentNames = ['No existing departments in database'];
@@ -1490,7 +1493,7 @@ const deleteMenu = () => {
     });
 };
 
-// Delete an employee
+// Deletes an employee from the database
 const deleteEmployee = () => {
     let employeeNames = ['No existing employees in database'];
     let query = 'SELECT employee.id, employee.first_name, employee.last_name, department.name ';
@@ -1614,7 +1617,7 @@ const deleteEmployee = () => {
     });
 };
 
-// Delete a role 
+// Deletes a role from the database
 const deleteRole = () => {
     let roleTitles = ['No existing roles in database'];
 
@@ -1674,7 +1677,7 @@ const deleteRole = () => {
     });
 };
 
-// Delete a department 
+// Deletes a department from the database
 const deleteDepartment = () => {
     let departmentNames = ['No existing departments in database'];
 
@@ -1732,7 +1735,7 @@ const deleteDepartment = () => {
     });
 };
 
-// Delete ALL data from database 
+// Deletes ALL data from the database 
 const deleteALLData = () => {
     let data = [];
     connection.query(`SELECT * FROM employee`, (err, res) => {
