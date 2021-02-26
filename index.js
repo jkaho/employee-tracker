@@ -498,7 +498,7 @@ const viewEmployeeByRoleAll = () => {
     query += 'LEFT JOIN role ON A.role_id = role.id ';
     query += 'LEFT JOIN department ON role.department_id = department.id ';
     query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
-    query += 'WHERE A.id <> null ';
+    query += 'WHERE role.title <> null AND A.id <> null ';
     query += 'ORDER BY role';
     connection.query(query, (err, res) => {
         if (err) throw err;
