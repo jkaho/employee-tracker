@@ -556,54 +556,6 @@ const viewEmployeeByRoleEach = (roleTitles) => {
 
 // VIEW EMPLOYEE BY DEPARTMENT MENU 
 const viewEmployeeByDepartmentMenu = () => {
-    inquirer.prompt([
-        {
-            name: 'allOrEach',
-            type: 'list',
-            message: 'How would you like to view employees?',
-            choices: [
-                'View by all departments',
-                'View by individual department',
-                'Go back to view employee menu'
-            ]
-        }
-    ]).then((answer) => {
-        switch(answer.allOrEach) {
-            case 'View by all departments':
-                viewEmployeeByDepartmentAll();
-                break;
-            case 'View by individual department':
-                viewEmployeeByDepartmentEach();
-                break;
-            default:
-                viewEmployeeMenu();
-                break;
-        };
-    });
-};
-
-// View employee data by all departments
-const viewEmployeeByDepartmentAll = () => {
-    let query = 'SELECT department.name AS department, A.id, A.first_name, A.last_name, role.title AS role, role.salary, B.first_name AS manager_first, B.last_name AS manager_last ';
-    query += 'FROM employee A ';
-    query += 'LEFT JOIN role ON A.role_id = role.id ';
-    query += 'LEFT JOIN department ON role.department_id = department.id ';
-    query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
-    query += 'WHERE department.name <> null AND A.id <> null ';
-    query += 'ORDER BY department';
-    connection.query(query, (err, res) => {
-        if (err) throw err;
-        if (res.length > 0) {
-            console.table(res);
-        } else {
-            console.log('There is no employee data to display.')
-        };
-        setTimeout(viewMenu, 1000);
-    });
-};
-
-// View employee data by each department
-const viewEmployeeByDepartmentEach = () => {
     departmentNames = ['No existing departments in database'];
     connection.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;
@@ -620,31 +572,77 @@ const viewEmployeeByDepartmentEach = () => {
 
             inquirer.prompt([
                 {
-                    name: 'departmentSelect',
+                    name: 'allOrEach',
                     type: 'list',
-                    message: 'Select department to view employees:',
-                    choices: departmentNames
+                    message: 'How would you like to view employees?',
+                    choices: [
+                        'View by all departments',
+                        'View by individual department',
+                        'Go back to view employee menu'
+                    ]
                 }
             ]).then((answer) => {
-                let departmentId = parseInt(answer.departmentSelect.split('|').splice(0, 1).join('').trim());
-
-                let query = 'SELECT department.name AS department, A.id, A.first_name, A.last_name, role.title AS role, role.salary, B.first_name AS manager_first, B.last_name AS manager_last ';
-                query += 'FROM employee A ';
-                query += 'LEFT JOIN role ON A.role_id = role.id ';
-                query += 'LEFT JOIN department ON role.department_id = department.id ';
-                query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
-                query += `WHERE role.department_id = ? AND A.id <> null `;
-                connection.query(query, [departmentId], (err, res) => {
-                    if (err) throw err;
-                    if (res.length < 1) {
-                        console.log('There is no employee data for this role.');
-                    } else {
-                        console.table(res);
-                    }
-                    setTimeout(viewMenu, 1000);
-                });
+                switch(answer.allOrEach) {
+                    case 'View by all departments':
+                        viewEmployeeByDepartmentAll();
+                        break;
+                    case 'View by individual department':
+                        viewEmployeeByDepartmentEach(departmentNames);
+                        break;
+                    default:
+                        viewEmployeeMenu();
+                        break;
+                };
             });
         };
+    });
+};
+
+// View employee data by all departments
+const viewEmployeeByDepartmentAll = () => {
+    let query = 'SELECT department.name AS department, A.id, A.first_name, A.last_name, role.title AS role, role.salary, B.first_name AS manager_first, B.last_name AS manager_last ';
+    query += 'FROM employee A ';
+    query += 'LEFT JOIN role ON A.role_id = role.id ';
+    query += 'LEFT JOIN department ON role.department_id = department.id ';
+    query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
+    query += 'ORDER BY department';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        if (res.length > 0) {
+            console.table(res);
+        } else {
+            console.log('There is no employee data to display.')
+        };
+        setTimeout(viewMenu, 1000);
+    });
+};
+
+// View employee data by each department
+const viewEmployeeByDepartmentEach = (departmentNames) => {
+    inquirer.prompt([
+        {
+            name: 'departmentSelect',
+            type: 'list',
+            message: 'Select department to view employees:',
+            choices: departmentNames
+        }
+    ]).then((answer) => {
+        let departmentId = parseInt(answer.departmentSelect.split('|').splice(0, 1).join('').trim());
+
+        let query = 'SELECT department.name AS department, A.id, A.first_name, A.last_name, role.title AS role, role.salary, B.first_name AS manager_first, B.last_name AS manager_last ';
+        query += 'FROM employee A ';
+        query += 'LEFT JOIN role ON A.role_id = role.id ';
+        query += 'LEFT JOIN department ON role.department_id = department.id ';
+        query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
+        connection.query(query, [departmentId], (err, res) => {
+            if (err) throw err;
+            if (res.length < 1) {
+                console.log('There is no employee data for this role.');
+            } else {
+                console.table(res);
+            }
+            setTimeout(viewMenu, 1000);
+        });
     });
 };
 
