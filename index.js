@@ -4,10 +4,6 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 
 // Database components
-let departments = [];
-let departmentNames = ['No existing departments in database'];
-let roles = [];
-let roleTitles = ['No existing roles in database'];
 let employees = [];
 let employeeNames = ['No existing employees in database'];
 
@@ -235,10 +231,10 @@ const addRole = () => {
 
 // Function for adding an employee
 const addEmployee = () => {
-    roles = [];
-    roleTitles = ['No existing roles in database'];
-    employees = [];
-    employeeNames = ['No existing employees in database'];
+    let roles = [];
+    let roleTitles = ['No existing roles in database'];
+    let employees = [];
+    let employeeNames = ['No existing employees in database'];
 
     connection.query(
         'SELECT * FROM role', (err, res) => {
@@ -288,11 +284,11 @@ const addEmployee = () => {
                             if (answer.confirmContinue === false) {
                                 addMenu();
                             } else {
-                                addEmployeeContinue(employeeFirstName, employeeLastName);
+                                addEmployeeContinue(employeeFirstName, employeeLastName, roleTitles, roles);
                             };
                         });
                     } else {
-                        addEmployeeContinue(employeeFirstName, employeeLastName);
+                        addEmployeeContinue(employeeFirstName, employeeLastName, roleTitles, roles);
                     };
                 });
             })
@@ -300,7 +296,7 @@ const addEmployee = () => {
     );
 };
 
-const addEmployeeContinue = (employeeFirstName, employeeLastName) => {
+const addEmployeeContinue = (employeeFirstName, employeeLastName, roleTitles, roles) => {
     inquirer.prompt([
         {
             name: 'employeeRole',
@@ -466,7 +462,7 @@ const viewEmployeeAll = () => {
 
 // VIEW EMPLOYEE BY ROLE MENU 
 const viewEmployeeByRoleMenu = () => {
-    roleTitles = [];
+    let roleTitles = [];
     connection.query('SELECT * FROM role', (err, res) => {
         if (err) throw err;
         if (res < 1) {
@@ -1087,8 +1083,8 @@ const updateEmployeePromise = (updatedFirstName, updatedLastName, updatedName, e
 
 // Update employee role 
 const updateEmployeeRole = (employeeId, employee, employeeRole) => {
-    roles = [];
-    roleTitles = ['No existing roles in database'];
+    let roles = [];
+    let roleTitles = ['No existing roles in database'];
     connection.query(
         'SELECT * FROM role', (err, res) => {
             if (err) throw err;
@@ -1627,7 +1623,7 @@ const deleteEmployee = () => {
 
 // Delete a role 
 const deleteRole = () => {
-    roleTitles = ['No existing roles in database'];
+    let roleTitles = ['No existing roles in database'];
 
     let query = 'SELECT role.id, role.title, role.salary, department.name ';
     query += 'FROM role ';
