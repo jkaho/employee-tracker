@@ -3,10 +3,7 @@ const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 
-// Database components
-let employees = [];
-let employeeNames = ['No existing employees in database'];
-
+// MySQL connection
 const connection = mysql.createConnection({
     host: 'localhost',
     // Your port
@@ -284,11 +281,11 @@ const addEmployee = () => {
                             if (answer.confirmContinue === false) {
                                 addMenu();
                             } else {
-                                addEmployeeContinue(employeeFirstName, employeeLastName, roleTitles, roles);
+                                addEmployeeContinue(employees, employeeNames, employeeFirstName, employeeLastName, roleTitles, roles);
                             };
                         });
                     } else {
-                        addEmployeeContinue(employeeFirstName, employeeLastName, roleTitles, roles);
+                        addEmployeeContinue(employees, employeeNames, employeeFirstName, employeeLastName, roleTitles, roles);
                     };
                 });
             })
@@ -296,7 +293,7 @@ const addEmployee = () => {
     );
 };
 
-const addEmployeeContinue = (employeeFirstName, employeeLastName, roleTitles, roles) => {
+const addEmployeeContinue = (employees, employeeNames, employeeFirstName, employeeLastName, roleTitles, roles) => {
     inquirer.prompt([
         {
             name: 'employeeRole',
@@ -869,8 +866,8 @@ const updateEmployeeMenu = () => {
     let employeeId;
     let managerId;
     let managerName;
-    employees = [];
-    employeeNames = ['No existing employees in database'];
+    let employees = [];
+    let employeeNames = ['No existing employees in database'];
 
     const updateEmployeePromise = (answer) => {
         if (method === 'input') {
@@ -1139,8 +1136,8 @@ const updateEmployeeRole = (employeeId, employee, employeeRole) => {
 
 // Update employee manager
 const updateEmployeeManager = (employeeId, managerId, managerName) => {
-    employees = [];
-    employeeNames = ['No existing employees in database'];
+    let employees = [];
+    let employeeNames = ['No existing employees in database'];
 
     connection.query(
         'SELECT * FROM employee', (err, res) => {
@@ -1499,7 +1496,7 @@ const deleteMenu = () => {
 
 // Delete an employee
 const deleteEmployee = () => {
-    employeeNames = ['No existing employees in database'];
+    let employeeNames = ['No existing employees in database'];
     let query = 'SELECT employee.id, employee.first_name, employee.last_name, department.name ';
     query += 'FROM employee ';
     query += 'LEFT JOIN role ON employee.role_id = role.id ';
