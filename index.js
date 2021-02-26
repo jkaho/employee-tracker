@@ -17,11 +17,11 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) throw err;
-    actionMenu();
+    mainMenu();
 });
 
-// ACTION MENU 
-const actionMenu = () => {
+// MAIN MENU 
+const mainMenu = () => {
     inquirer.prompt([
         {
             name: 'action',
@@ -92,7 +92,7 @@ const addMenu = () => {
                 addDepartment();
                 break;
             default:
-                actionMenu();
+                mainMenu();
                 break;
         }
     });
@@ -126,7 +126,7 @@ const addDepartment = () => {
                     (err, res) => {
                         if (err) throw err;
                         console.log(`'${answer.departmentName.trim()}' department successfully added to database!`);
-                        setTimeout(actionMenu, 1000);
+                        setTimeout(mainMenu, 1000);
                     }
                 );
             }
@@ -215,7 +215,7 @@ const addRole = () => {
                                 (err, res) => {
                                     if (err) throw err;
                                     console.log(`Role successfully added!\nRole: ${roleTitle}\nSalary: $${answers.roleSalary}/yr\nDepartment: ${departmentName}`);
-                                    setTimeout(actionMenu, 1000);
+                                    setTimeout(mainMenu, 1000);
                                 }
                             );
                         });
@@ -358,7 +358,7 @@ const addEmployeeContinue = (employees, employeeNames, employeeFirstName, employ
                     connection.query(query, [employeeFirstName, employeeLastName, roleId, managerId], (err, res) => {
                         if (err) throw err;
                         console.log(`Employee successfully added!\nName: ${employeeFirstName} ${employeeLastName}\nRole: ${employeeRole}\nManager: ${managerName}`);
-                        setTimeout(actionMenu, 1000);
+                        setTimeout(mainMenu, 1000);
                     });
                 });
             }
@@ -394,7 +394,7 @@ const viewMenu = () => {
                 viewDepartmentMenu();
                 break;
             default:
-                actionMenu();
+                mainMenu();
                 break;
         };
     });
@@ -851,7 +851,7 @@ const updateMenu = () => {
                 updateDepartment();
                 break;
             default:
-                actionMenu();
+                mainMenu();
                 break;
         };
     });
@@ -1488,7 +1488,7 @@ const deleteMenu = () => {
                 deleteALLData();
                 break;
             default:
-                actionMenu();
+                mainMenu();
                 break;
         };
     });
