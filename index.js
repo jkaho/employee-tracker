@@ -1633,14 +1633,7 @@ const deleteRole = () => {
     query += 'JOIN department ON role.department_id = department.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        if (res.length > 0) {
-            if (roleTitles[0] === 'No existing roles in database') {
-                roleTitles.splice(0, 1);
-            };
-            res.forEach((item) => {
-                roleTitles.push(`${item.id} | ${item.title} | ${item.salary} | ${item.name}`);
-            });
-        } else {
+        if (res.length < 1) {
             inquirer.prompt([
                 {
                     name: 'noRoles',
@@ -1648,39 +1641,46 @@ const deleteRole = () => {
                     message: 'There are no existing roles in the database...',
                     choices: ['Go back to delete menu']
                 }
-            ]).then(deleteMenu());
-        };
+            ]).then(() => deleteMenu());
+        } else {
+            if (roleTitles[0] === 'No existing roles in database') {
+                roleTitles.splice(0, 1);
+            };
+            res.forEach((item) => {
+                roleTitles.push(`${item.id} | ${item.title} | ${item.salary} | ${item.name}`);
+            });
 
-        inquirer.prompt([
-            {
-                name: 'deleteRole',
-                type: 'list',
-                message: 'Select a role to delete:',
-                choices: roleTitles
-            }
-        ])
-        .then((answer) => {
-            let roleId = parseInt(answer.deleteRole.split(' ').splice(0, 1));
-            let roleName = answer.deleteRole.split(' ').slice(2, answer.deleteRole.split(' ').length - 4).join(' ').trim();
             inquirer.prompt([
                 {
-                    name: 'deleteConfirm',
-                    type: 'confirm',
-                    message: `Are you sure you want to delete the role '${roleName}'?`
+                    name: 'deleteRole',
+                    type: 'list',
+                    message: 'Select a role to delete:',
+                    choices: roleTitles
                 }
-            ]).then((answer) => {
-                if (answer.deleteConfirm === true) {
-                    connection.query(`DELETE FROM role WHERE id = ?`, [roleId], (err, res) => {
-                        if (err) throw err;
-                        console.log(`Role ('${roleName}', id: ${roleId}) successfully deleted.`);
+            ])
+            .then((answer) => {
+                let roleId = parseInt(answer.deleteRole.split(' ').splice(0, 1));
+                let roleName = answer.deleteRole.split(' ').slice(2, answer.deleteRole.split(' ').length - 4).join(' ').trim();
+                inquirer.prompt([
+                    {
+                        name: 'deleteConfirm',
+                        type: 'confirm',
+                        message: `Are you sure you want to delete the role '${roleName}'?`
+                    }
+                ]).then((answer) => {
+                    if (answer.deleteConfirm === true) {
+                        connection.query(`DELETE FROM role WHERE id = ?`, [roleId], (err, res) => {
+                            if (err) throw err;
+                            console.log(`Role ('${roleName}', id: ${roleId}) successfully deleted.`);
+                            setTimeout(deleteMenu, 1000);
+                        });
+                    } else {
+                        console.log('Action cancelled. Returning to delete menu...');
                         setTimeout(deleteMenu, 1000);
-                    });
-                } else {
-                    console.log('Action cancelled. Returning to delete menu...');
-                    setTimeout(deleteMenu, 1000);
-                };
+                    };
+                });
             });
-        });
+        };
     });
 };
 
