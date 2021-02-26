@@ -454,7 +454,7 @@ const viewEmployeeAll = () => {
     query += 'LEFT JOIN employee B ON A.manager_id = B.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        if (res.length > 1) {
+        if (res.length > 0) {
             console.table(res);
         } else {
             console.log('There is no employee data to display.')
@@ -501,7 +501,7 @@ const viewEmployeeByRoleAll = () => {
     query += 'ORDER BY role';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        if (res.length > 1) {
+        if (res.length > 0) {
             console.table(res);
         } else {
             console.log('There is no employee data to display.')
@@ -591,7 +591,7 @@ const viewEmployeeByDepartmentAll = () => {
     query += 'ORDER BY department';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        if (res.length > 1) {
+        if (res.length > 0) {
             console.table(res);
         } else {
             console.log('There is no employee data to display.')
@@ -742,7 +742,7 @@ const viewRoles = () => {
     query += 'LEFT JOIN department ON role.department_id = department.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        if (res.length > 1) {
+        if (res.length > 0) {
             console.table(res);
         } else {
             console.log('There is no role data to display.')
