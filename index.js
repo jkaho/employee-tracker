@@ -872,6 +872,7 @@ const updateEmployeeMenu = () => {
     let employeeId;
     let managerId;
     let managerName;
+    employees = [];
     employeeNames = ['No existing employees in database'];
 
     const updateEmployeePromise = (answer) => {
@@ -937,7 +938,7 @@ const updateEmployeeMenu = () => {
                             // Continue to functions
                             switch(answer.updateEmployee) {
                                 case 'Employee name':
-                                    updateEmployeeName(employeeId, employee);
+                                    updateEmployeeName(employeeId, employee, employees);
                                     break;
                                 case 'Employee role':
                                     updateEmployeeRole(employeeId, employee, employeeRole);
@@ -979,6 +980,7 @@ const updateEmployeeMenu = () => {
                 employeeNames.splice(0, 1);
             };
             res.forEach((item) => {
+                employees.push(item);
                 employeeNames.push(`${item.id} | ${item.first_name} ${item.last_name} | ${item.title} | ${item.name}`);
             });
 
@@ -1027,7 +1029,7 @@ const updateEmployeeMenu = () => {
 };
 
 // Update employee name 
-const updateEmployeeName = (employeeId, employee) => {
+const updateEmployeeName = (employeeId, employee, employees) => {
     inquirer.prompt([
         {
             name: 'updateFirstName',
@@ -1041,19 +1043,44 @@ const updateEmployeeName = (employeeId, employee) => {
         }
     ])
     .then((answers) => {
-        let query = 'UPDATE employee ';
-        query += 'SET first_name = ?, last_name = ? WHERE id = ?'
-        connection.query(query, [answers.updateFirstName.trim(), answers.updateLastName.trim(), employeeId], (err, res) => {
-            if (err) throw err;
-            console.log(`Employee (id: ${employeeId}) name successfully updated!`);
-            connection.query(
-                `SELECT * FROM employee WHERE id = ?`, [employeeId], (err, res) => {
-                    if (err) throw err;
-                    console.log(`${employee} (previous name) ---> ${res[0].first_name} ${res[0].last_name} (updated name)\n`);
-                    setTimeout(updateMenu, 2000);
-                }
-            );
+        let employeeExists = false;
+        let updatedFirstName = answers.updateFirstName.trim();
+        let updatedLastName = answers.updateLastName.trim();
+        let updatedName = `${updatedFirstName} ${updatedLastName}`;
+
+        employees.forEach((item) => {
+            if (`${item.first_name} ${item.last_name}` === updatedName) {
+                employeeExists = true;
+            };
         });
+
+        if (employeeExists === true) {
+            inquirer.prompt([
+                {
+                    name: 'confirmContinue',
+                    type: 'confirm',
+                    message: `An employee named '${updatedName}' already exists. Would you still like to proceed?`
+                }
+            ]).then((answer) => {
+                if (answer.confirmContinue === false) {
+                    actionMenu();
+                } else {
+                    updateEmployeePromise(updatedFirstName, updatedLastName, updatedName, employee, employeeId);
+                };
+            });
+        } else {
+            updateEmployeePromise(updatedFirstName, updatedLastName, updatedName, employee, employeeId);
+        }
+    });
+};
+
+const updateEmployeePromise = (updatedFirstName, updatedLastName, updatedName, employee, employeeId) => {
+    let query = 'UPDATE employee ';
+    query += 'SET first_name = ?, last_name = ? WHERE id = ?'
+    connection.query(query, [updatedFirstName, updatedLastName, employeeId], (err, res) => {
+        if (err) throw err;
+        console.log(`Employee (id: ${employeeId}) name successfully updated!\n${employee} (previous name) ---> ${updatedName} (updated name)\n`);
+        setTimeout(updateMenu, 2000);
     });
 };
 
