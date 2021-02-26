@@ -1245,7 +1245,7 @@ const updateRoleMenu = () => {
                 ]).then((answer) => {
                     switch(answer.updateRoleAction) {
                         case 'Update title':
-                            updateRoleTitle(roleId, roleTitle);
+                            updateRoleTitle(roleId, roleTitle, roles);
                             break;
                         case 'Update salary':
                             updateRoleSalary(roleId, roleSalary);
@@ -1264,7 +1264,7 @@ const updateRoleMenu = () => {
 };
 
 // Update role title
-const updateRoleTitle = (roleId, roleTitle) => {
+const updateRoleTitle = (roleId, roleTitle, roles) => {
     inquirer.prompt([
         {
             name: 'updateRoleTitle',
@@ -1273,16 +1273,25 @@ const updateRoleTitle = (roleId, roleTitle) => {
         }
     ])
     .then((answer) => {
-        connection.query(`UPDATE role SET title = ? WHERE id = ?`, [answer.updateRoleTitle.trim(), roleId], (err, res) => {
-            if (err) throw err;
-            console.log(`Role (id: ${roleId}) title successfully updated!`);
+        let roleExists = false;
+        let newRoleTitle = answer.updateRoleTitle.trim();
 
-            connection.query(`SELECT * FROM role WHERE id = ?`, [roleId], (err, res) => {
+        roles.forEach((item) => {
+            if (item.title === newRoleTitle) {
+                roleExists = true;
+            }; 
+        });
+
+        if (roleExists === true) {
+            console.log(`A role titled '${newRoleTitle}' already exists.`);
+            setTimeout(updateMenu, 2000);
+        } else {
+            connection.query(`UPDATE role SET title = ? WHERE id = ?`, [newRoleTitle, roleId], (err, res) => {
                 if (err) throw err;
-                console.log(`${roleTitle} (previous title) ---> ${res[0].title} (updated title)`);
+                console.log(`Role (id: ${roleId}) title successfully updated!\n${roleTitle} (previous title) ---> ${newRoleTitle} (updated title)`);
                 setTimeout(updateMenu, 2000);
             });
-        });
+        };
     });
 };
 
