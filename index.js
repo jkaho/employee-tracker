@@ -407,29 +407,29 @@ const viewEmployeeMenu = () => {
         {
             name: 'viewEmployees',
             type: 'list',
-            message: '----------VIEW EMPLOYEES----------\nHow would you like to view employees?',
+            message: `${chalk.hex('#ffdd8c')('▬▬▬▬▬▬▬▬ VIEW EMPLOYEES ▬▬▬▬▬▬▬▬')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
-                'View all',
-                'View by role',
-                'View by department',
-                'View by manager',
-                'Go back to view menu'
+                'View all employees',
+                'View employee by role',
+                'View employee by department',
+                'View employee by manager',
+                chalk.italic('Go back to view menu')
             ]
         }
     ])
     .then((answer) => {
         // Continue to functions
         switch(answer.viewEmployees) {
-            case 'View all':
+            case 'View all employees':
                 viewEmployeeAll();
                 break;
-            case 'View by role':
+            case 'View employee by role':
                 viewEmployeeByRoleMenu();
                 break;
-            case 'View by department':
+            case 'View employee by department':
                 viewEmployeeByDepartmentMenu();
                 break;
-            case 'View by manager':
+            case 'View employee by manager':
                 viewEmployeeByManagerMenu();
                 break;
             default:
@@ -598,7 +598,7 @@ const viewEmployeeByDepartmentAll = () => {
     let query = 'SELECT department.name AS department, A.id, A.first_name, A.last_name, role.title AS role, role.salary, B.first_name AS manager_first, B.last_name AS manager_last ';
     query += 'FROM employee A ';
     query += 'LEFT JOIN role ON A.role_id = role.id ';
-    query += 'LEFT JOIN department ON role.department_id = department.id ';
+    query += 'JOIN department ON role.department_id = department.id ';
     query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
     query += 'ORDER BY department';
     connection.query(query, (err, res) => {
