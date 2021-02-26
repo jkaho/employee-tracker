@@ -1356,6 +1356,7 @@ const updateRoleDepartment = (roleId, departmentName) => {
 
 // Update department name
 const updateDepartment = () => {
+    departments = [];
     departmentNames = ['No existing departments in database'];
 
     connection.query('SELECT * FROM department', (err, res) => {
@@ -1376,6 +1377,7 @@ const updateDepartment = () => {
                 departmentNames.splice(0, 1);
             };
             res.forEach(({ id, name }) => {
+                departments.push({ id, name });
                 departmentNames.push(`${id} | ${name}`);
             });
 
@@ -1399,13 +1401,25 @@ const updateDepartment = () => {
                     }
                 ])
                 .then((answer) => {
+                    let departmentExists = false;
                     let updatedDepartmentName = answer.updatedDepartmentName.trim();
 
-                    connection.query(`UPDATE department SET name = ? WHERE id = ?`, [updatedDepartmentName, departmentId], (err, res) => {
-                        if (err) throw err;
-                        console.log(`Department (id: ${departmentId}) name successfully updated!\n${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`);
-                        setTimeout(updateMenu, 2000);
+                    departments.forEach((item) => {
+                        if (item.name === updatedDepartmentName) {
+                            departmentExists = true;
+                        }; 
                     });
+        
+                    if (departmentExists === true) {
+                        console.log(`A department named '${updatedDepartmentName}' already exists.`);
+                        setTimeout(updateMenu, 2000);
+                    } else {
+                        connection.query(`UPDATE department SET name = ? WHERE id = ?`, [updatedDepartmentName, departmentId], (err, res) => {
+                            if (err) throw err;
+                            console.log(`Department (id: ${departmentId}) name successfully updated!\n${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`);
+                            setTimeout(updateMenu, 2000);
+                        });
+                    };
                 });
             });
         };
