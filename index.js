@@ -409,48 +409,41 @@ const viewMenu = () => {
 
 // VIEW EMPLOYEES MENU
 const viewEmployeeMenu = () => {
-    connection.query('SELECT * FROM employee', (err, res) => {
-        if (err) throw err;
-        if (res.length < 1) {
-            console.log('There are no existing employees in the database.');
-            setTimeout(viewMenu, 1000);
-        } else {
-            inquirer.prompt([
-                {
-                    name: 'viewEmployees',
-                    type: 'list',
-                    message: '----------VIEW EMPLOYEES----------\nHow would you like to view employees?',
-                    choices: [
-                        'View all',
-                        'View by role',
-                        'View by department',
-                        'View by manager',
-                        'Go back to view menu'
-                    ]
-                }
-            ])
-            .then((answer) => {
-                // Continue to functions
-                switch(answer.viewEmployees) {
-                    case 'View all':
-                        viewEmployeeAll();
-                        break;
-                    case 'View by role':
-                        viewEmployeeByRoleMenu();
-                        break;
-                    case 'View by department':
-                        viewEmployeeByDepartmentMenu();
-                        break;
-                    case 'View by manager':
-                        viewEmployeeByManagerMenu();
-                        break;
-                    default:
-                        viewMenu();
-                        break;
-                };
-            });
+    inquirer.prompt([
+        {
+            name: 'viewEmployees',
+            type: 'list',
+            message: '----------VIEW EMPLOYEES----------\nHow would you like to view employees?',
+            choices: [
+                'View all',
+                'View by role',
+                'View by department',
+                'View by manager',
+                'Go back to view menu'
+            ]
+        }
+    ])
+    .then((answer) => {
+        // Continue to functions
+        switch(answer.viewEmployees) {
+            case 'View all':
+                viewEmployeeAll();
+                break;
+            case 'View by role':
+                viewEmployeeByRoleMenu();
+                break;
+            case 'View by department':
+                viewEmployeeByDepartmentMenu();
+                break;
+            case 'View by manager':
+                viewEmployeeByManagerMenu();
+                break;
+            default:
+                viewMenu();
+                break;
         };
     });
+    
 };
 
 // View all employee data 
