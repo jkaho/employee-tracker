@@ -27,7 +27,7 @@ const mainMenu = () => {
         {
             name: 'action',
             type: 'list',
-            message: `${chalk.hex('#edae2f')('◄▬▬▬▬▬▬▬▬▬▬ MAIN MENU ▬▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
+            message: `${chalk.hex('#ffdd8c')('▬▬▬▬▬▬▬▬▬▬ MAIN MENU ▬▬▬▬▬▬▬▬▬▬')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Add data',
                 'View data',
@@ -71,7 +71,7 @@ const addMenu = () => {
         {
             name: 'addAction',
             type: 'list',
-            message: `${chalk.hex('#ffdd8c')('◄▬▬▬▬▬▬▬▬▬▬ ADD MENU ▬▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
+            message: `${chalk.hex('#ffdd8c')('▬▬▬▬▬▬▬▬▬▬ ADD MENU ▬▬▬▬▬▬▬▬▬▬▬')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Add an employee',
                 'Add a role',
@@ -373,7 +373,7 @@ const viewMenu = () => {
         {
             name: 'viewAction',
             type: 'list',
-            message: `${chalk.hex('#ffdd8c')('◄▬▬▬▬▬▬▬▬▬▬ VIEW MENU ▬▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
+            message: `${chalk.hex('#ffdd8c')('▬▬▬▬▬▬▬▬▬▬ VIEW MENU ▬▬▬▬▬▬▬▬▬▬')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'View employees',
                 'View roles',
@@ -830,7 +830,7 @@ const updateMenu = () => {
         {
             name: 'updateAction',
             type: 'list',
-            message: `${chalk.hex('#ffdd8c')('◄▬▬▬▬▬▬▬▬▬ UPDATE MENU ▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
+            message: `${chalk.hex('#ffdd8c')('▬▬▬▬▬▬▬▬▬ UPDATE MENU ▬▬▬▬▬▬▬▬▬')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Update an employee',
                 'Update a role',
@@ -1310,7 +1310,7 @@ const updateRoleTitle = (roleId, roleTitle, roles) => {
         } else {
             connection.query(`UPDATE role SET title = ? WHERE id = ?`, [newRoleTitle, roleId], (err, res) => {
                 if (err) throw err;
-                console.log(`Role (id: ${roleId}) title successfully updated!\n${roleTitle} (previous title) ---> ${newRoleTitle} (updated title)`);
+                console.log(chalk.greenBright(`Role (id: ${roleId}) title successfully updated!\n`) + chalk.yellowBright(`${roleTitle} (previous title) ---> ${newRoleTitle} (updated title)\n`));
                 setTimeout(updateMenu, 1000);
             });
         };
@@ -1331,13 +1331,8 @@ const updateRoleSalary = (roleId, roleSalary) => {
         let newSalary = parseInt(answer.updateRoleSalary);
         connection.query(`UPDATE role SET salary = ? WHERE id = ?`, [newSalary, roleId], (err, res) => {
             if (err) throw err;
-            console.log(`Role (id: ${roleId}) successfully updated!`);
-
-            connection.query(`SELECT salary FROM role WHERE id = ?`, [roleId], (err, res) => {
-                if (err) throw err;
-                console.log(`${roleSalary} (previous salary) ---> $${res[0].salary}/yr (updated salary)`);
-                setTimeout(updateMenu, 1000);
-            });
+            console.log(chalk.greenBright(`Role (id: ${roleId}) successfully updated!\n`) + chalk.yellowBright(`${roleSalary} (previous salary) ---> $${newSalary}/yr (updated salary)\n`));
+            setTimeout(updateMenu, 1000);
         });
     });
 };
@@ -1378,7 +1373,7 @@ const updateRoleDepartment = (roleId, departmentName) => {
             updatedDepartmentName  = answer.updateRoleDepartment.split(' ').splice(2);
             connection.query(`UPDATE role SET department_id = ? WHERE id = ?`, [updatedDepartmentId, roleId], (err, res) => {
                 if (err) throw err;
-                console.log(`Role (id: ${roleId}) department successfully updated!\n${departmentName} (previous department) ---> ${updatedDepartmentName} (updated department)`);
+                console.log(chalk.greenBright(`Role (id: ${roleId}) department successfully updated!\n`) + chalk.yellowBright(`${departmentName} (previous department) ---> ${updatedDepartmentName} (updated department)\n`));
                 setTimeout(updateMenu, 1000);
             }); 
         });
@@ -1447,7 +1442,7 @@ const updateDepartment = () => {
                     } else {
                         connection.query(`UPDATE department SET name = ? WHERE id = ?`, [updatedDepartmentName, departmentId], (err, res) => {
                             if (err) throw err;
-                            console.log(`Department (id: ${departmentId}) name successfully updated!\n${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`);
+                            console.log(chalk.greenBright(`Department (id: ${departmentId}) name successfully updated!\n`) + chalk.yellowBright(`${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`));
                             setTimeout(updateMenu, 1000);
                         });
                     };
@@ -1463,7 +1458,7 @@ const deleteMenu = () => {
         {
             name: 'deleteAction',
             type: 'list',
-            message: `${chalk.hex('#ffdd8c')('◄▬▬▬▬▬▬▬▬▬ DELETE MENU ▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
+            message: `${chalk.hex('#ffdd8c')('▬▬▬▬▬▬▬▬▬ DELETE MENU ▬▬▬▬▬▬▬▬▬')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Delete an employee',
                 'Delete a role',
@@ -1564,11 +1559,11 @@ const deleteEmployee = () => {
                                         if (answer.confirmation === true) {
                                             connection.query(`DELETE FROM employee WHERE id = ?`, [employeeId], (err, res) => {
                                                 if (err) throw err;
-                                                console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
+                                                console.log(chalk.greenBright(`Employee ('${name}', id: ${employeeId}) successfully deleted.\n`));
                                                 setTimeout(deleteMenu, 1000);
                                             });
                                         } else {
-                                            console.log('Action cancelled. Returning to delete menu...');
+                                            console.log(chalk.redBright('Action cancelled. Returning to delete menu...\n'));
                                             setTimeout(deleteMenu, 1000);
                                         };
                                     });
@@ -1600,11 +1595,11 @@ const deleteEmployee = () => {
                                 if (answer.confirmation === true) {
                                     connection.query(`DELETE FROM employee WHERE id = ?`, [employeeId], (err, res) => {
                                         if (err) throw err;
-                                        console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
+                                        console.log(chalk.greenBright(`Employee ('${name}', id: ${employeeId}) successfully deleted.\n`));
                                         setTimeout(deleteMenu, 1000);
                                     });
                                 } else {
-                                    console.log('Action cancelled. Returning to delete menu...');
+                                    console.log(chalk.redBright('Action cancelled. Returning to delete menu...\n'));
                                     setTimeout(deleteMenu, 1000);
                                 };
                             });
@@ -1666,11 +1661,11 @@ const deleteRole = () => {
                     if (answer.deleteConfirm === true) {
                         connection.query(`DELETE FROM role WHERE id = ?`, [roleId], (err, res) => {
                             if (err) throw err;
-                            console.log(`Role ('${roleName}', id: ${roleId}) successfully deleted.`);
+                            console.log(chalk.greenBright(`Role ('${roleName}', id: ${roleId}) successfully deleted.\n`));
                             setTimeout(deleteMenu, 1000);
                         });
                     } else {
-                        console.log('Action cancelled. Returning to delete menu...');
+                        console.log(chalk.redBright('Action cancelled. Returning to delete menu...\n'));
                         setTimeout(deleteMenu, 1000);
                     };
                 });
@@ -1724,11 +1719,11 @@ const deleteDepartment = () => {
                     if (answer.deleteConfirm === true) {
                         connection.query(`DELETE FROM department WHERE id = ?`, [departmentId], (err, res) => {
                             if (err) throw err;
-                            console.log(`Department ('${departmentName}', id: ${departmentId}) successfully deleted.`);
+                            console.log(chalk.greenBright(`Department ('${departmentName}', id: ${departmentId}) successfully deleted.\n`));
                             setTimeout(deleteMenu, 1000);
                         });
                     } else {
-                        console.log('Action cancelled. Returning to delete menu...');
+                        console.log(chalk.redBright('Action cancelled. Returning to delete menu...\n'));
                         setTimeout(deleteMenu, 1000);
                     };
                 });
@@ -1770,7 +1765,7 @@ const deleteALLData = () => {
                         }
                     ]).then((answer) => {
                         if (answer.deleteConfirmOne === false) {
-                            console.log('Action cancelled. Returning to delete menu...');
+                            console.log(chalk.redBright('Action cancelled. Returning to delete menu...\n'));
                             setTimeout(deleteMenu, 1000);
                         } else {
                             inquirer.prompt([
@@ -1781,7 +1776,7 @@ const deleteALLData = () => {
                                 }
                             ]).then((answer) => {
                                 if (answer.deleteConfirmTwo === false) {
-                                    console.log('Action cancelled. Returning to delete menu...');
+                                    console.log(chalk.redBright('Action cancelled. Returning to delete menu...\n'));
                                     setTimeout(deleteMenu, 1000);
                                 } else {
                                     inquirer.prompt([
@@ -1798,13 +1793,13 @@ const deleteALLData = () => {
                                                     if (err) throw err;
                                                     connection.query('DELETE FROM department', (err, res) => {
                                                         if (err) throw err;
-                                                        console.log('All data records successfully deleted.');
+                                                        console.log(chalk.greenBright('All data records successfully deleted.\n'));
                                                         setTimeout(deleteMenu, 1000); 
                                                     });
                                                 });
                                             });
                                         } else {
-                                            console.log('Incorrect input. Action cancelled. Returning to delete menu...');
+                                            console.log(chalk.redBright('Incorrect input. Action cancelled. Returning to delete menu...\n'));
                                             setTimeout(deleteMenu, 1000);
                                         };
                                     });
