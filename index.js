@@ -62,7 +62,7 @@ const actionMenu = () => {
                 console.log('Application shutting down...');
                 setTimeout(() => {
                     connection.end();
-                }, 2000);
+                }, 1000);
                 break;
             default:
                 console.log('Invalid action');
@@ -126,14 +126,14 @@ const addDepartment = () => {
 
             if (departmentExists === true) {
                 console.log(`A department named '${answer.departmentName.trim()}' already exists.`);
-                setTimeout(addMenu, 2000);
+                setTimeout(addMenu, 1000);
             } else {
                 connection.query(
                     `INSERT INTO department(name) VALUES(?)`, [answer.departmentName.trim()],
                     (err, res) => {
                         if (err) throw err;
                         console.log(`'${answer.departmentName.trim()}' department successfully added to database!`);
-                        setTimeout(actionMenu, 2000);
+                        setTimeout(actionMenu, 1000);
                     }
                 );
             }
@@ -186,7 +186,7 @@ const addRole = () => {
         
                     if (roleExists === true) {
                         console.log(`A role titled '${roleTitle}' already exists.`);
-                        setTimeout(addMenu, 2000);
+                        setTimeout(addMenu, 1000);
                     } else {
                         inquirer.prompt([
                             {
@@ -222,7 +222,7 @@ const addRole = () => {
                                 (err, res) => {
                                     if (err) throw err;
                                     console.log(`Role successfully added!\nRole: ${roleTitle}\nSalary: $${answers.roleSalary}/yr\nDepartment: ${departmentName}`);
-                                    setTimeout(actionMenu, 2000);
+                                    setTimeout(actionMenu, 1000);
                                 }
                             );
                         });
@@ -286,7 +286,7 @@ const addEmployee = () => {
                             }
                         ]).then((answer) => {
                             if (answer.confirmContinue === false) {
-                                actionMenu();
+                                addMenu();
                             } else {
                                 addEmployeeContinue(employeeFirstName, employeeLastName);
                             };
@@ -365,7 +365,7 @@ const addEmployeeContinue = (employeeFirstName, employeeLastName) => {
                     connection.query(query, [employeeFirstName, employeeLastName, roleId, managerId], (err, res) => {
                         if (err) throw err;
                         console.log(`Employee successfully added!\nName: ${employeeFirstName} ${employeeLastName}\nRole: ${employeeRole}\nManager: ${managerName}`);
-                        setTimeout(actionMenu, 2000);
+                        setTimeout(actionMenu, 1000);
                     });
                 });
             }
@@ -459,7 +459,7 @@ const viewEmployeeAll = () => {
         } else {
             console.log('There is no employee data to display.')
         };
-        setTimeout(viewMenu, 2000);
+        setTimeout(viewMenu, 1000);
     });
 };
 
@@ -506,7 +506,7 @@ const viewEmployeeByRoleAll = () => {
         } else {
             console.log('There is no employee data to display.')
         };
-        setTimeout(viewMenu, 2000);
+        setTimeout(viewMenu, 1000);
     });
 };
 
@@ -517,7 +517,7 @@ const viewEmployeeByRoleEach = () => {
         if (err) throw err;
         if (res < 1) {
             console.log('There are no roles to display.');
-            setTimeout(viewMenu, 2000);
+            setTimeout(viewMenu, 1000);
         } else {
             res.forEach((item) => {
                 roleTitles.push(`${item.id} | ${item.title}`);
@@ -546,7 +546,7 @@ const viewEmployeeByRoleEach = () => {
                     } else {
                         console.table(res);
                     }
-                    setTimeout(viewMenu, 2000);
+                    setTimeout(viewMenu, 1000);
                 });
             });
         };
@@ -596,7 +596,7 @@ const viewEmployeeByDepartmentAll = () => {
         } else {
             console.log('There is no employee data to display.')
         };
-        setTimeout(viewMenu, 2000);
+        setTimeout(viewMenu, 1000);
     });
 };
 
@@ -607,7 +607,7 @@ const viewEmployeeByDepartmentEach = () => {
         if (err) throw err;
         if (res < 1) {
             console.log('There are no departments to display.');
-            setTimeout(viewMenu, 2000);
+            setTimeout(viewMenu, 1000);
         } else {
             if (departmentNames[0] === 'No existing departments in database') {
                 departmentNames.splice(0, 1);
@@ -639,7 +639,7 @@ const viewEmployeeByDepartmentEach = () => {
                     } else {
                         console.table(res);
                     }
-                    setTimeout(viewMenu, 2000);
+                    setTimeout(viewMenu, 1000);
                 });
             });
         };
@@ -689,7 +689,7 @@ const viewEmployeeByManagerAll = () => {
         } else {
             console.log('There are no managers.')
         };
-        setTimeout(viewMenu, 2000);
+        setTimeout(viewMenu, 1000);
     });
 };
 
@@ -703,7 +703,7 @@ const viewEmployeeByManagerEach = () => {
         if (err) throw err;
         if (res.length < 1) {
             console.log('There are no managers.');
-            setTimeout(viewMenu, 2000);
+            setTimeout(viewMenu, 1000);
         } else {
             res.forEach((item) => {
                 managers.push(`${item.manager_id} | ${item.manager_first} ${item.manager_last}`);
@@ -728,7 +728,7 @@ const viewEmployeeByManagerEach = () => {
                 connection.query(query, [managerId], (err, res) => {
                     if (err) throw err;
                     console.table(res);
-                    setTimeout(viewMenu, 2000);
+                    setTimeout(viewMenu, 1000);
                 });
             });
         };
@@ -747,7 +747,7 @@ const viewRoles = () => {
         } else {
             console.log('There is no role data to display.')
         };
-        setTimeout(viewMenu, 2000);
+        setTimeout(viewMenu, 1000);
     });
 };
 
@@ -789,7 +789,7 @@ const viewDepartments = () => {
         } else {
             console.log('There is no department data to display.')
         };
-        setTimeout(viewMenu, 2000);
+        setTimeout(viewMenu, 1000);
     });
 };
 
@@ -800,7 +800,7 @@ const viewDepartmentBudget = () => {
         if (err) throw err;
         if (res.length < 1) {
             console.log('There is no department data to display.');
-            setTimeout(viewMenu, 2000);
+            setTimeout(viewMenu, 1000);
         } else {
             if (departmentNames[0] === 'No existing departments in database') {
                 departmentNames.splice(0, 1);
@@ -822,7 +822,7 @@ const viewDepartmentBudget = () => {
                 (err, res) => {
                     if (err) throw err;
                     console.table(res);
-                    setTimeout(viewMenu, 2000);
+                    setTimeout(viewMenu, 1000);
                 });
             });
         };
@@ -886,7 +886,7 @@ const updateEmployeeMenu = () => {
 
             if (res.length < 1) {
                 console.log(`Sorry! No employees with the id ${employeeId} found in the database.`);
-                setTimeout(updateMenu, 2000);
+                setTimeout(updateMenu, 1000);
             } else {
                 employee = res[0].first_name + ' ' + res[0].last_name;
             
@@ -1063,7 +1063,7 @@ const updateEmployeeName = (employeeId, employee, employees) => {
                 }
             ]).then((answer) => {
                 if (answer.confirmContinue === false) {
-                    actionMenu();
+                    updateMenu();
                 } else {
                     updateEmployeePromise(updatedFirstName, updatedLastName, updatedName, employee, employeeId);
                 };
@@ -1080,7 +1080,7 @@ const updateEmployeePromise = (updatedFirstName, updatedLastName, updatedName, e
     connection.query(query, [updatedFirstName, updatedLastName, employeeId], (err, res) => {
         if (err) throw err;
         console.log(`Employee (id: ${employeeId}) name successfully updated!\n${employee} (previous name) ---> ${updatedName} (updated name)\n`);
-        setTimeout(updateMenu, 2000);
+        setTimeout(updateMenu, 1000);
     });
 };
 
@@ -1130,7 +1130,7 @@ const updateEmployeeRole = (employeeId, employee, employeeRole) => {
                             `SELECT * FROM role WHERE id = ?`, [roleId], (err, res) => {
                                 if (err) throw err;
                                 console.log(`${employeeRole} (previous role) ---> ${res[0].title} (updated role)\n`);
-                                setTimeout(updateMenu, 2000);
+                                setTimeout(updateMenu, 1000);
                             }
                         );
                     });
@@ -1193,7 +1193,7 @@ const updateEmployeeManager = (employeeId, managerId, managerName) => {
                             } else {
                                 console.log(`${managerName} (previous manager) ---> No manager (updated manager)\n`);
                             }
-                            setTimeout(updateMenu, 2000);
+                            setTimeout(updateMenu, 1000);
                         }
                     );
                 });
@@ -1311,12 +1311,12 @@ const updateRoleTitle = (roleId, roleTitle, roles) => {
 
         if (roleExists === true) {
             console.log(`A role titled '${newRoleTitle}' already exists.`);
-            setTimeout(updateMenu, 2000);
+            setTimeout(updateMenu, 1000);
         } else {
             connection.query(`UPDATE role SET title = ? WHERE id = ?`, [newRoleTitle, roleId], (err, res) => {
                 if (err) throw err;
                 console.log(`Role (id: ${roleId}) title successfully updated!\n${roleTitle} (previous title) ---> ${newRoleTitle} (updated title)`);
-                setTimeout(updateMenu, 2000);
+                setTimeout(updateMenu, 1000);
             });
         };
     });
@@ -1341,7 +1341,7 @@ const updateRoleSalary = (roleId, roleSalary) => {
             connection.query(`SELECT salary FROM role WHERE id = ?`, [roleId], (err, res) => {
                 if (err) throw err;
                 console.log(`${roleSalary} (previous salary) ---> $${res[0].salary}/yr (updated salary)`);
-                setTimeout(updateMenu, 2000);
+                setTimeout(updateMenu, 1000);
             });
         });
     });
@@ -1384,7 +1384,7 @@ const updateRoleDepartment = (roleId, departmentName) => {
             connection.query(`UPDATE role SET department_id = ? WHERE id = ?`, [updatedDepartmentId, roleId], (err, res) => {
                 if (err) throw err;
                 console.log(`Role (id: ${roleId}) department successfully updated!\n${departmentName} (previous department) ---> ${updatedDepartmentName} (updated department)`);
-                setTimeout(updateMenu, 2000);
+                setTimeout(updateMenu, 1000);
             }); 
         });
     });
@@ -1448,12 +1448,12 @@ const updateDepartment = () => {
         
                     if (departmentExists === true) {
                         console.log(`A department named '${updatedDepartmentName}' already exists.`);
-                        setTimeout(updateMenu, 2000);
+                        setTimeout(updateMenu, 1000);
                     } else {
                         connection.query(`UPDATE department SET name = ? WHERE id = ?`, [updatedDepartmentName, departmentId], (err, res) => {
                             if (err) throw err;
                             console.log(`Department (id: ${departmentId}) name successfully updated!\n${departmentName} (previous name) ---> ${updatedDepartmentName} (updated name)\n`);
-                            setTimeout(updateMenu, 2000);
+                            setTimeout(updateMenu, 1000);
                         });
                     };
                 });
@@ -1555,7 +1555,7 @@ const deleteEmployee = () => {
                                 if (err) throw err;
                                 if (res.length < 1) {
                                     console.log(`Sorry! No employees with the id ${employeeId} found in the database.`);
-                                    setTimeout(deleteMenu, 2000);
+                                    setTimeout(deleteMenu, 1000);
                                 } else {
                                     let name = `${res[0].first_name} ${res[0].last_name}`;
                                     inquirer.prompt([
@@ -1570,10 +1570,11 @@ const deleteEmployee = () => {
                                             connection.query(`DELETE FROM employee WHERE id = ?`, [employeeId], (err, res) => {
                                                 if (err) throw err;
                                                 console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
-                                                setTimeout(deleteMenu, 2000);
+                                                setTimeout(deleteMenu, 1000);
                                             });
                                         } else {
-                                            deleteMenu();
+                                            console.log('Action cancelled. Returning to delete menu...');
+                                            setTimeout(deleteMenu, 1000);
                                         };
                                     });
                                 };
@@ -1605,10 +1606,11 @@ const deleteEmployee = () => {
                                     connection.query(`DELETE FROM employee WHERE id = ?`, [employeeId], (err, res) => {
                                         if (err) throw err;
                                         console.log(`Employee ('${name}', id: ${employeeId}) successfully deleted.`);
-                                        setTimeout(deleteMenu, 2000);
+                                        setTimeout(deleteMenu, 1000);
                                     });
                                 } else {
-                                    deleteMenu();
+                                    console.log('Action cancelled. Returning to delete menu...');
+                                    setTimeout(deleteMenu, 1000);
                                 };
                             });
                         });
@@ -1671,11 +1673,11 @@ const deleteRole = () => {
                     connection.query(`DELETE FROM role WHERE id = ?`, [roleId], (err, res) => {
                         if (err) throw err;
                         console.log(`Role ('${roleName}', id: ${roleId}) successfully deleted.`);
-                        setTimeout(deleteMenu, 2000);
+                        setTimeout(deleteMenu, 1000);
                     });
                 } else {
                     console.log('Action cancelled. Returning to delete menu...');
-                    setTimeout(deleteMenu, 2000);
+                    setTimeout(deleteMenu, 1000);
                 };
             });
         });
@@ -1729,11 +1731,11 @@ const deleteDepartment = () => {
                     connection.query(`DELETE FROM department WHERE id = ?`, [departmentId], (err, res) => {
                         if (err) throw err;
                         console.log(`Department ('${departmentName}', id: ${departmentId}) successfully deleted.`);
-                        setTimeout(deleteMenu, 2000);
+                        setTimeout(deleteMenu, 1000);
                     });
                 } else {
                     console.log('Action cancelled. Returning to delete menu...');
-                    setTimeout(deleteMenu, 2000);
+                    setTimeout(deleteMenu, 1000);
                 };
             });
         });
@@ -1751,7 +1753,7 @@ const deleteALLData = () => {
     ]).then((answer) => {
         if (answer.deleteConfirmOne === false) {
             console.log('Action cancelled. Returning to delete menu...');
-            setTimeout(deleteMenu, 2000);
+            setTimeout(deleteMenu, 1000);
         } else {
             inquirer.prompt([
                 {
@@ -1762,7 +1764,7 @@ const deleteALLData = () => {
             ]).then((answer) => {
                 if (answer.deleteConfirmTwo === false) {
                     console.log('Action cancelled. Returning to delete menu...');
-                    setTimeout(deleteMenu, 2000);
+                    setTimeout(deleteMenu, 1000);
                 } else {
                     inquirer.prompt([
                         {
@@ -1779,13 +1781,13 @@ const deleteALLData = () => {
                                     connection.query('DELETE FROM department', (err, res) => {
                                         if (err) throw err;
                                         console.log('All data records successfully deleted.');
-                                        setTimeout(deleteMenu, 2000); 
+                                        setTimeout(deleteMenu, 1000); 
                                     });
                                 });
                             });
                         } else {
                             console.log('Incorrect input. Action cancelled. Returning to delete menu...');
-                            setTimeout(deleteMenu, 2000);
+                            setTimeout(deleteMenu, 1000);
                         };
                     });
                 };
