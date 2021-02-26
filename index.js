@@ -479,7 +479,7 @@ const viewEmployeeByRoleMenu = () => {
                     choices: [
                         'View by all roles',
                         'View by individual role',
-                        'Go back to view employee menu'
+                        chalk.italic('Go back to view employee menu')
                     ]
                 }
             ]).then((answer) => {
@@ -573,7 +573,7 @@ const viewEmployeeByDepartmentMenu = () => {
                     choices: [
                         'View by all departments',
                         'View by individual department',
-                        'Go back to view employee menu'
+                        chalk.italic('Go back to view employee menu')
                     ]
                 }
             ]).then((answer) => {
@@ -651,7 +651,7 @@ const viewEmployeeByManagerMenu = () => {
             choices: [
                 'View by all managers',
                 'View by individual manager',
-                'Go back to view employee menu'
+                chalk.italic('Go back to view employee menu')
             ]
         }
     ]).then((answer) => {
@@ -756,7 +756,7 @@ const viewDepartmentMenu = () => {
             choices: [
                 'View all departments',
                 'View total utilized budget of a department',
-                'Go back to view menu'
+                chalk.italic('Go back to view menu')
             ]
         }
     ]).then((answer) => {
@@ -920,12 +920,12 @@ const updateEmployeeMenu = () => {
                             {
                                 name: 'updateEmployee',
                                 type: 'list',
-                                message: `----------UPDATE EMPLOYEE MENU (${employee}, ${employeeRole})----------\nWhat data would you like to update?`,
+                                message: `${chalk.hex('#ffdd8c')(`▬▬▬▬▬▬▬ UPDATE EMPLOYEE (${employee}, ${employeeRole}) ▬▬▬▬▬▬▬`)}\n${chalk.hex('#bec0c2').italic('What data would you like to update?')}`,
                                 choices: [
                                     'Employee name',
                                     'Employee role',
                                     'Employee manager',
-                                    'Go back to update menu'
+                                    chalk.italic('Go back to update menu')
                                 ]
                             }
                         ])
@@ -987,7 +987,7 @@ const updateEmployeeMenu = () => {
                     choices: [
                         'Find employee by id',
                         'View all employees',
-                        'Go back to update menu'
+                        chalk.italic('Go back to update menu')
                     ]
                 }
             ]).then((answer) => {
@@ -1261,7 +1261,7 @@ const updateRoleMenu = () => {
                             'Update title',
                             'Update salary',
                             'Update department',
-                            'Go back to update menu'
+                            chalk.italic('Go back to update menu')
                         ]
                     }
                 ]).then((answer) => {
@@ -1524,7 +1524,7 @@ const deleteEmployee = () => {
                     choices: [
                         'Find employee by id',
                         'View all employees',
-                        'Go back to delete menu'
+                        chalk.italic('Go back to delete menu')
                     ]
                 }
             ])
