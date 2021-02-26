@@ -450,6 +450,7 @@ const viewEmployeeAll = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length > 0) {
+            console.log('');
             console.table(res);
         } else {
             console.log('There is no employee data to display.')
@@ -511,6 +512,7 @@ const viewEmployeeByRoleAll = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length > 0) {
+            console.log('');
             console.table(res);
         } else {
             console.log('There is no employee data to display.')
@@ -542,6 +544,7 @@ const viewEmployeeByRoleEach = (roleTitles) => {
             if (res.length < 1) {
                 console.log('There is no employee data for this role.');
             } else {
+                console.log('');
                 console.table(res);
             }
             setTimeout(viewMenu, 1000);
@@ -605,6 +608,7 @@ const viewEmployeeByDepartmentAll = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length > 0) {
+            console.log('');
             console.table(res);
         } else {
             console.log('There is no employee data to display.')
@@ -635,6 +639,7 @@ const viewEmployeeByDepartmentEach = (departmentNames) => {
             if (res.length < 1) {
                 console.log('There is no employee data for this role.');
             } else {
+                console.log('');
                 console.table(res);
             }
             setTimeout(viewMenu, 1000);
@@ -682,6 +687,7 @@ const viewEmployeeByManagerAll = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length > 0) {
+            console.log('');
             console.table(res);
         } else {
             console.log('There are no managers.')
@@ -724,6 +730,7 @@ const viewEmployeeByManagerEach = () => {
                 query += 'ORDER BY A.manager_id';
                 connection.query(query, [managerId], (err, res) => {
                     if (err) throw err;
+                    console.log('');
                     console.table(res);
                     setTimeout(viewMenu, 1000);
                 });
@@ -740,6 +747,7 @@ const viewRoles = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length > 0) {
+            console.log('');
             console.table(res);
         } else {
             console.log('There is no role data to display.')
@@ -783,6 +791,7 @@ const viewDepartments = () => {
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length > 0) {
+            console.log('');
             console.table(res);
         } else {
             console.log('There is no department data to display.')
@@ -819,6 +828,7 @@ const viewDepartmentBudget = () => {
                 connection.query(`SELECT SUM(salary) AS total_utilized_budget FROM role WHERE department_id = ?`, [departmentId],
                 (err, res) => {
                     if (err) throw err;
+                    console.log('');
                     console.table(res);
                     setTimeout(viewMenu, 1000);
                 });
