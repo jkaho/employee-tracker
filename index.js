@@ -1744,54 +1744,81 @@ const deleteDepartment = () => {
 
 // Delete ALL data from database 
 const deleteALLData = () => {
-    inquirer.prompt([
-        {
-            name: 'deleteConfirmOne',
-            type: 'confirm',
-            message: 'If you proceed, ALL records (employees, roles & departments) will be deleted. Are you sure you want to continue?'
-        }
-    ]).then((answer) => {
-        if (answer.deleteConfirmOne === false) {
-            console.log('Action cancelled. Returning to delete menu...');
-            setTimeout(deleteMenu, 1000);
-        } else {
-            inquirer.prompt([
-                {
-                    name: 'deleteConfirmTwo', 
-                    type: 'confirm',
-                    message: 'Final warning. ALL your data will be erased, never to be retrieved again. Continue?'
-                }
-            ]).then((answer) => {
-                if (answer.deleteConfirmTwo === false) {
-                    console.log('Action cancelled. Returning to delete menu...');
-                    setTimeout(deleteMenu, 1000);
+    let data = [];
+    connection.query(`SELECT * FROM employee`, (err, res) => {
+        if (err) throw err;
+        res.forEach((item) => data.push(item));
+
+        connection.query(`SELECT * FROM role`, (err, res) => {
+            if (err) throw err;
+            res.forEach((item) => data.push(item));
+            
+            connection.query(`SELECT * FROM department`, (err, res) => {
+                if (err) throw err;
+                res.forEach((item) => data.push(item));
+                
+                if (data.length < 1) {
+                    inquirer.prompt([
+                        {
+                            name: 'noData',
+                            type: 'list',
+                            message: 'There is no existing data in the database...',
+                            choices: ['Go back to delete menu']
+                        }
+                    ]).then(() => deleteMenu());
                 } else {
                     inquirer.prompt([
                         {
-                            name: 'deleteValidation',
-                            type: 'input',
-                            message: `To delete all data records, enter 'I really do want to delete everything':`
+                            name: 'deleteConfirmOne',
+                            type: 'confirm',
+                            message: 'If you proceed, ALL records (employees, roles & departments) will be deleted. Are you sure you want to continue?'
                         }
                     ]).then((answer) => {
-                        if (answer.deleteValidation === 'I really do want to delete everything') {
-                            connection.query('DELETE FROM employee', (err, res) => {
-                                if (err) throw err;
-                                connection.query('DELETE FROM role', (err, res) => {
-                                    if (err) throw err;
-                                    connection.query('DELETE FROM department', (err, res) => {
-                                        if (err) throw err;
-                                        console.log('All data records successfully deleted.');
-                                        setTimeout(deleteMenu, 1000); 
-                                    });
-                                });
-                            });
-                        } else {
-                            console.log('Incorrect input. Action cancelled. Returning to delete menu...');
+                        if (answer.deleteConfirmOne === false) {
+                            console.log('Action cancelled. Returning to delete menu...');
                             setTimeout(deleteMenu, 1000);
+                        } else {
+                            inquirer.prompt([
+                                {
+                                    name: 'deleteConfirmTwo', 
+                                    type: 'confirm',
+                                    message: 'Final warning. ALL your data will be erased, never to be retrieved again. Continue?'
+                                }
+                            ]).then((answer) => {
+                                if (answer.deleteConfirmTwo === false) {
+                                    console.log('Action cancelled. Returning to delete menu...');
+                                    setTimeout(deleteMenu, 1000);
+                                } else {
+                                    inquirer.prompt([
+                                        {
+                                            name: 'deleteValidation',
+                                            type: 'input',
+                                            message: `To delete all data records, enter 'I really do want to delete everything':`
+                                        }
+                                    ]).then((answer) => {
+                                        if (answer.deleteValidation === 'I really do want to delete everything') {
+                                            connection.query('DELETE FROM employee', (err, res) => {
+                                                if (err) throw err;
+                                                connection.query('DELETE FROM role', (err, res) => {
+                                                    if (err) throw err;
+                                                    connection.query('DELETE FROM department', (err, res) => {
+                                                        if (err) throw err;
+                                                        console.log('All data records successfully deleted.');
+                                                        setTimeout(deleteMenu, 1000); 
+                                                    });
+                                                });
+                                            });
+                                        } else {
+                                            console.log('Incorrect input. Action cancelled. Returning to delete menu...');
+                                            setTimeout(deleteMenu, 1000);
+                                        };
+                                    });
+                                };
+                            });
                         };
                     });
                 };
             });
-        };
+        });
     });
 };
