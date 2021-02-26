@@ -27,13 +27,13 @@ const mainMenu = () => {
         {
             name: 'action',
             type: 'list',
-            message: '----------MAIN MENU----------\nWhat would you like to do?',
+            message: `${chalk.hex('#1ba877')('◄▬▬▬▬▬▬▬▬▬▬ MAIN MENU ▬▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Add data',
                 'View data',
                 'Update data',
                 'Delete data',
-                'Exit application'
+                chalk.bold.italic('Exit application')
             ]
         }
     ])
@@ -52,8 +52,8 @@ const mainMenu = () => {
             case 'Delete data':
                 deleteMenu();
                 break;
-            case 'Exit application':
-                console.log('Application shutting down...');
+            case chalk.bold.italic('Exit application'):
+                console.log(chalk.hex('#fac02d')('Application shutting down...'));
                 setTimeout(() => {
                     connection.end();
                 }, 1000);
