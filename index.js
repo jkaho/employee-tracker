@@ -825,7 +825,11 @@ const viewDepartmentBudget = () => {
                 }
             ]).then((answer) => {
                 let departmentId = parseInt(answer.departmentName.split(' ').splice(0, 1));
-                connection.query(`SELECT SUM(salary) AS total_utilized_budget FROM role WHERE department_id = ?`, [departmentId],
+                let query = 'SELECT department.name AS department, SUM(role.salary) AS total_utilized_budget_$ ';
+                query += 'FROM department ';
+                query += 'LEFT JOIN role ON role.department_id = department.id ';
+                query += `WHERE department.id = ?` 
+                connection.query(query, [departmentId],
                 (err, res) => {
                     if (err) throw err;
                     console.log('');
