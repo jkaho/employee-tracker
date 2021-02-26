@@ -589,6 +589,7 @@ const viewEmployeeByDepartmentAll = () => {
     query += 'LEFT JOIN role ON A.role_id = role.id ';
     query += 'LEFT JOIN department ON role.department_id = department.id ';
     query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
+    query += 'WHERE department.name <> null AND A.id <> null ';
     query += 'ORDER BY department';
     connection.query(query, (err, res) => {
         if (err) throw err;
@@ -632,7 +633,7 @@ const viewEmployeeByDepartmentEach = () => {
                 query += 'LEFT JOIN role ON A.role_id = role.id ';
                 query += 'LEFT JOIN department ON role.department_id = department.id ';
                 query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
-                query += `WHERE role.department_id = ?`;
+                query += `WHERE role.department_id = ? AND A.id <> null `;
                 connection.query(query, [departmentId], (err, res) => {
                     if (err) throw err;
                     if (res.length < 1) {
