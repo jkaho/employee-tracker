@@ -151,8 +151,8 @@ const validateNum = (num) => {
 
 // Function for adding a role
 const addRole = () => {
-    departments = [];
-    departmentNames = ['No existing departments in database'];
+    let departments = [];
+    let departmentNames = ['No existing departments in database'];
 
     connection.query(
         'SELECT * FROM department', (err, res) => {
@@ -403,7 +403,7 @@ const viewMenu = () => {
             default:
                 actionMenu();
                 break;
-        }
+        };
     });
 };
 
@@ -557,7 +557,7 @@ const viewEmployeeByRoleEach = (roleTitles) => {
 
 // VIEW EMPLOYEE BY DEPARTMENT MENU 
 const viewEmployeeByDepartmentMenu = () => {
-    departmentNames = ['No existing departments in database'];
+    let departmentNames = ['No existing departments in database'];
     connection.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;
         if (res < 1) {
@@ -796,7 +796,7 @@ const viewDepartments = () => {
 
 // View department budget
 const viewDepartmentBudget = () => {
-    departmentNames = ['No existing departments in database'];
+    let departmentNames = ['No existing departments in database'];
     connection.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;
         if (res.length < 1) {
@@ -1350,7 +1350,7 @@ const updateRoleSalary = (roleId, roleSalary) => {
 
 // Update role department
 const updateRoleDepartment = (roleId, departmentName) => {
-    departmentNames = ['No existing departments in database'];
+    let departmentNames = ['No existing departments in database'];
     connection.query(`SELECT * FROM department`, (err, res) => {
         if (err) throw err;
         if (res.length < 1) {
@@ -1393,8 +1393,8 @@ const updateRoleDepartment = (roleId, departmentName) => {
 
 // Update department name
 const updateDepartment = () => {
-    departments = [];
-    departmentNames = ['No existing departments in database'];
+    let departments = [];
+    let departmentNames = ['No existing departments in database'];
 
     connection.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;
@@ -1687,7 +1687,7 @@ const deleteRole = () => {
 
 // Delete a department 
 const deleteDepartment = () => {
-    departmentNames = ['No existing departments in database'];
+    let departmentNames = ['No existing departments in database'];
 
     connection.query('SELECT * FROM department', (err, res) => {
         if (err) throw err;
