@@ -1783,6 +1783,9 @@ const deleteALLData = () => {
                                     });
                                 });
                             });
+                        } else {
+                            console.log('Incorrect input. Action cancelled. Returning to delete menu...');
+                            setTimeout(deleteMenu, 2000);
                         };
                     });
                 };
