@@ -27,7 +27,7 @@ const mainMenu = () => {
         {
             name: 'action',
             type: 'list',
-            message: `${chalk.hex('#1ba877')('◄▬▬▬▬▬▬▬▬▬▬ MAIN MENU ▬▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
+            message: `${chalk.hex('#edae2f')('◄▬▬▬▬▬▬▬▬▬▬ MAIN MENU ▬▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Add data',
                 'View data',
@@ -53,7 +53,7 @@ const mainMenu = () => {
                 deleteMenu();
                 break;
             case chalk.bold.italic('Exit application'):
-                console.log(chalk.hex('#fac02d')('Application shutting down...'));
+                console.log(chalk.cyan('Application closed.\n'));
                 setTimeout(() => {
                     connection.end();
                 }, 1000);
@@ -71,12 +71,12 @@ const addMenu = () => {
         {
             name: 'addAction',
             type: 'list',
-            message: '----------ADD MENU----------\nWhat would you like to do?',
+            message: `${chalk.hex('#ffdd8c')('◄▬▬▬▬▬▬▬▬▬▬ ADD MENU ▬▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Add an employee',
                 'Add a role',
                 'Add a department',
-                'Go back to main menu'
+                chalk.italic('Go back to main menu')
             ]
         }
     ])
@@ -126,7 +126,7 @@ const addDepartment = () => {
                     `INSERT INTO department(name) VALUES(?)`, [answer.departmentName.trim()],
                     (err, res) => {
                         if (err) throw err;
-                        console.log(`'${answer.departmentName.trim()}' department successfully added to database!`);
+                        console.log(chalk.greenBright(`'${answer.departmentName.trim()}' department successfully added to database!\n`));
                         setTimeout(mainMenu, 1000);
                     }
                 );
@@ -215,7 +215,7 @@ const addRole = () => {
                                 `INSERT INTO role(title, salary, department_id) VALUES (?, ?, ?)`, [roleTitle, parseInt(answers.roleSalary), departmentId],
                                 (err, res) => {
                                     if (err) throw err;
-                                    console.log(`Role successfully added!\nRole: ${roleTitle}\nSalary: $${answers.roleSalary}/yr\nDepartment: ${departmentName}`);
+                                    console.log(chalk.greenBright(`'${roleTitle}' role ($${answers.roleSalary}/yr | ${departmentName}) successfully added to database!\n`));
                                     setTimeout(mainMenu, 1000);
                                 }
                             );
@@ -358,7 +358,7 @@ const addEmployeeContinue = (employees, employeeNames, employeeFirstName, employ
                     query += `VALUES(?, ?, ?, ?)`
                     connection.query(query, [employeeFirstName, employeeLastName, roleId, managerId], (err, res) => {
                         if (err) throw err;
-                        console.log(`Employee successfully added!\nName: ${employeeFirstName} ${employeeLastName}\nRole: ${employeeRole}\nManager: ${managerName}`);
+                        console.log(chalk.greenBright(`Employee '${employeeFirstName} ${employeeLastName}' (role: ${employeeRole} | manager: ${managerName}) successfully added to database!\n`));
                         setTimeout(mainMenu, 1000);
                     });
                 });
@@ -373,12 +373,12 @@ const viewMenu = () => {
         {
             name: 'viewAction',
             type: 'list',
-            message: '----------VIEW MENU----------\nWhat would you like to do?',
+            message: `${chalk.hex('#ffdd8c')('◄▬▬▬▬▬▬▬▬▬▬ VIEW MENU ▬▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'View employees',
                 'View roles',
                 'View departments',
-                'Go back to main menu'
+                chalk.italic('Go back to main menu')
             ]
         }
     ])
@@ -830,12 +830,12 @@ const updateMenu = () => {
         {
             name: 'updateAction',
             type: 'list',
-            message: '----------UPDATE MENU----------\nWhat would you like to update?',
+            message: `${chalk.hex('#ffdd8c')('◄▬▬▬▬▬▬▬▬▬ UPDATE MENU ▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Update an employee',
                 'Update a role',
                 'Update a department',
-                'Go back to main menu'
+                chalk.italic('Go back to main menu')
             ]
         }
     ])
@@ -1074,7 +1074,7 @@ const updateEmployeePromise = (updatedFirstName, updatedLastName, updatedName, e
     query += 'SET first_name = ?, last_name = ? WHERE id = ?'
     connection.query(query, [updatedFirstName, updatedLastName, employeeId], (err, res) => {
         if (err) throw err;
-        console.log(`Employee (id: ${employeeId}) name successfully updated!\n${employee} (previous name) ---> ${updatedName} (updated name)\n`);
+        console.log(chalk.greenBright(`Employee (id: ${employeeId}) name successfully updated!\n`) + chalk.yellowBright(`${employee} (previous name) ---> ${updatedName} (updated name)\n`));
         setTimeout(updateMenu, 1000);
     });
 };
@@ -1120,11 +1120,11 @@ const updateEmployeeRole = (employeeId, employee, employeeRole) => {
                     query += 'SET role_id = ? WHERE id = ?'
                     connection.query(query, [roleId, employeeId], (err, res) => {
                         if (err) throw err;
-                        console.log(`Employee (id: ${employeeId} | ${employee}) role successfully updated!`);
+                        console.log(chalk.greenBright(`Employee (id: ${employeeId} | ${employee}) role successfully updated!`));
                         connection.query(
                             `SELECT * FROM role WHERE id = ?`, [roleId], (err, res) => {
                                 if (err) throw err;
-                                console.log(`${employeeRole} (previous role) ---> ${res[0].title} (updated role)\n`);
+                                console.log(chalk.yellowBright(`${employeeRole} (previous role) ---> ${res[0].title} (updated role)\n`));
                                 setTimeout(updateMenu, 1000);
                             }
                         );
@@ -1181,12 +1181,12 @@ const updateEmployeeManager = (employeeId, managerId, managerName) => {
                     connection.query(
                         'UPDATE employee SET manager_id = ? WHERE id = ?', [newManagerId, employeeId], (err, res) => {
                             if (err) throw err;
-                            console.log(`Employee manager successfully updated!`);
+                            console.log(chalk.greenBright(`Employee manager successfully updated!`));
     
                             if (newManagerId !== null) {
-                                console.log(`${managerName} (previous manager) ---> ${answer.updateManager.split(2)} (updated manager)\n`);
+                                console.log(chalk.yellowBright(`${managerName} (previous manager) ---> ${answer.updateManager.split('|').splice(1).join('').trim()} (updated manager)\n`));
                             } else {
-                                console.log(`${managerName} (previous manager) ---> No manager (updated manager)\n`);
+                                console.log(chalk.yellowBright(`${managerName} (previous manager) ---> No manager (updated manager)\n`));
                             }
                             setTimeout(updateMenu, 1000);
                         }
@@ -1463,13 +1463,13 @@ const deleteMenu = () => {
         {
             name: 'deleteAction',
             type: 'list',
-            message: '----------DELETE MENU----------\nWhat would you like to delete?',
+            message: `${chalk.hex('#ffdd8c')('◄▬▬▬▬▬▬▬▬▬ DELETE MENU ▬▬▬▬▬▬▬▬▬►')}\n${chalk.hex('#bec0c2').italic('What would you like to do?')}`,
             choices: [
                 'Delete an employee',
                 'Delete a role',
                 'Delete a department',
                 'Delete ALL data',
-                'Go back to main menu'
+                chalk.italic('Go back to main menu')
             ]
         }
     ])
