@@ -16,12 +16,13 @@
 
 1. Clone this repository onto your local computer.
 2. Using the MySQL server, run the 'schema.sql' file to create the application database.
-3. In the command line, navigate to the cloned repository (the 'employee-tracker' directory).
-4. Install the required dependencies by running the command: **npm install** 
+3. (Optional) For testing purposes, run the 'seed.sql' file to pre-populate the database.
+4. In the command line, navigate to the cloned repository (the 'employee-tracker' directory).
+5. Install the required dependencies by running the command: **npm install** 
 
 ## Video Walkthrough
 
-[Click here]() to view a video walkthrough of the application functionality.
+[Click here](https://drive.google.com/file/d/1l169Oli96u7uk08FU8Lc9omK-agXakGg/view?usp=sharing) to view a video walkthrough of the application functionality.
 
 ## Technologies Used
 
@@ -35,7 +36,9 @@
 - npm console.table package
 - npm chalk package
 
-## Screenshots
+## Application User Interface
+
+![Employee Tracker GUI](images/employee-tracker-gui.gif)
 
 ## Questions
 
