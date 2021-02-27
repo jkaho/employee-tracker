@@ -119,7 +119,7 @@ const addDepartment = () => {
             });
 
             if (departmentExists === true) {
-                console.log(`A department named '${answer.departmentName.trim()}' already exists.`);
+                console.log(chalk.redBright(`A department named '${answer.departmentName.trim()}' already exists.\n`));
                 setTimeout(addMenu, 1000);
             } else {
                 connection.query(
@@ -179,7 +179,7 @@ const addRole = () => {
                     });
                     
                     if (roleExists === true) { 
-                        console.log(`A role titled '${roleTitle}' already exists.`);
+                        console.log(chalk.redBright(`A role titled '${roleTitle}' already exists.\n`));
                         setTimeout(addMenu, 1000);
                     } else {
                         inquirer.prompt([
@@ -1326,7 +1326,7 @@ const updateRoleTitle = (roleId, roleTitle, roles) => {
         });
 
         if (roleExists === true) {
-            console.log(`A role titled '${newRoleTitle}' already exists.`);
+            console.log(chalk.redBright(`A role titled '${newRoleTitle}' already exists.\n`));
             setTimeout(updateMenu, 1000);
         } else {
             connection.query(`UPDATE role SET title = ? WHERE id = ?`, [newRoleTitle, roleId], (err, res) => {
@@ -1458,7 +1458,7 @@ const updateDepartment = () => {
                     });
         
                     if (departmentExists === true) {
-                        console.log(`A department named '${updatedDepartmentName}' already exists.`);
+                        console.log(chalk.redBright(`A department named '${updatedDepartmentName}' already exists.\n`));
                         setTimeout(updateMenu, 1000);
                     } else {
                         connection.query(`UPDATE department SET name = ? WHERE id = ?`, [updatedDepartmentName, departmentId], (err, res) => {
