@@ -634,6 +634,7 @@ const viewEmployeeByDepartmentEach = (departmentNames) => {
         query += 'LEFT JOIN role ON A.role_id = role.id ';
         query += 'LEFT JOIN department ON role.department_id = department.id ';
         query += 'LEFT JOIN employee B ON A.manager_id = B.id ';
+        query += 'WHERE department.id = ?'
         connection.query(query, [departmentId], (err, res) => {
             if (err) throw err;
             if (res.length < 1) {
