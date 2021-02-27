@@ -1,36 +1,36 @@
 -- Pre-populates department values --
-INSERT INTO department(name) VALUES('accounting and finance');
+INSERT INTO department(name) VALUES('Accounting and Finance');
 
-INSERT INTO department(name) VALUES('marketing');
+INSERT INTO department(name) VALUES('Marketing');
 
-INSERT INTO department(name) VALUES('human resource management');
+INSERT INTO department(name) VALUES('Human Resource Management');
 
-INSERT INTO department(name) VALUES('information technology');
+INSERT INTO department(name) VALUES('Information Technology');
 
 -- Pre-populates role values --
 INSERT INTO role(title, salary, department_id)
-VALUES('accounting manager', 80000, 1);
+VALUES('Accounting Manager', 80000, 1);
 
 INSERT INTO role(title, salary, department_id)
-VALUES('accountant', 60000, 1);
+VALUES('Accountant', 60000, 1);
 
 INSERT INTO role(title, salary, department_id)
-VALUES('marketing manager', 100000, 2);
+VALUES('Marketing Manager', 100000, 2);
 
 INSERT INTO role(title, salary, department_id)
-VALUES('marketing specialist', 70000, 2);
+VALUES('Marketing Specialist', 70000, 2);
 
 INSERT INTO role(title, salary, department_id)
-VALUES('hr manager', 90000, 3);
+VALUES('HR Manager', 90000, 3);
 
 INSERT INTO role(title, salary, department_id)
-VALUES('hr administrator', 60000, 3);
+VALUES('HR Administrator', 60000, 3);
 
 INSERT INTO role(title, salary, department_id)
-VALUES('it manager', 95000, 4);
+VALUES('IT Manager', 95000, 4);
 
 INSERT INTO role(title, salary, department_id)
-VALUES('it consultant', 75000, 4);
+VALUES('IT Consultant', 75000, 4);
 
 -- Pre-populates employee values --
 INSERT INTO employee(first_name, last_name, role_id, manager_id) 
