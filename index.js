@@ -710,7 +710,9 @@ const viewEmployeeByManagerEach = () => {
             setTimeout(viewMenu, 1000);
         } else {
             res.forEach((item) => {
-                managers.push(`${item.manager_id} | ${item.manager_first} ${item.manager_last}`);
+                if (managers.includes(`${item.manager_id} | ${item.manager_first} ${item.manager_last}`) === false) {
+                    managers.push(`${item.manager_id} | ${item.manager_first} ${item.manager_last}`);
+                }
             });
     
             inquirer.prompt([
