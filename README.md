@@ -9,7 +9,7 @@
 - [Installation](#Installation)
 - [Video Walkthrough](#Video-Walkthrough)
 - [Technologies Used](#Technologies-Used)
-- [Screenshots](#Application-User-Interface)
+- [Application User Interface](#Application-User-Interface)
 - [Questions](#Questions)
 
 ## Installation
