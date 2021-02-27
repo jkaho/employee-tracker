@@ -1391,7 +1391,7 @@ const updateRoleDepartment = (roleId, departmentName) => {
         ])
         .then((answer) => {
             updatedDepartmentId = parseInt(answer.updateRoleDepartment.split(' ').splice(0));
-            updatedDepartmentName  = answer.updateRoleDepartment.split(' ').splice(2);
+            updatedDepartmentName  = answer.updateRoleDepartment.split('|').splice(1).join('').trim();
             connection.query(`UPDATE role SET department_id = ? WHERE id = ?`, [updatedDepartmentId, roleId], (err, res) => {
                 if (err) throw err;
                 console.log(chalk.greenBright(`Role (id: ${roleId}) department successfully updated!\n`) + chalk.yellowBright(`${departmentName} (previous department) ---> ${updatedDepartmentName} (updated department)\n`));
