@@ -1159,11 +1159,12 @@ const updateEmployeeRole = (employeeId, employee, employeeRole) => {
 
 // Updates an employee's manager
 const updateEmployeeManager = (employeeId, managerId, managerName) => {
-    let employees = [];
     let employeeNames = ['No existing employees in database'];
-
+    let query = 'SELECT employee.id, employee.first_name, employee.last_name, role.title AS role ';
+    query += 'FROM employee ';
+    query += 'LEFT JOIN role ON employee.role_id = role.id';
     connection.query(
-        'SELECT * FROM employee', (err, res) => {
+        query, (err, res) => {
             if (err) throw err;
             if (res.length < 1) {
                 inquirer.prompt([
@@ -1180,9 +1181,8 @@ const updateEmployeeManager = (employeeId, managerId, managerName) => {
                 if (employeeNames[0] === 'No existing employees in database') {
                     employeeNames.splice(0, 1);
                 }
-                res.forEach(({ id, first_name, last_name, role_id, manager_id }) => {
-                    employees.push({id, first_name, last_name, role_id, manager_id});
-                    employeeNames.push(`${id} | ${first_name} ${last_name}`);
+                res.forEach(({ id, first_name, last_name, role }) => {
+                    employeeNames.push(`${id} | ${first_name} ${last_name} | ${role}`);
                 });
                 employeeNames.push('No manager');
 
@@ -1195,6 +1195,7 @@ const updateEmployeeManager = (employeeId, managerId, managerName) => {
                     }
                 ]).then((answer) => {
                     let newManagerId;
+                    let newManagerName = answer.updateManager.split('|').splice(1, 1).join('').trim();
                     if (answer.updateManager === 'No manager') {
                         newManagerId = null;
                     } else {
@@ -1206,7 +1207,7 @@ const updateEmployeeManager = (employeeId, managerId, managerName) => {
                             console.log(chalk.greenBright(`Employee manager successfully updated!`));
     
                             if (newManagerId !== null) {
-                                console.log(chalk.yellowBright(`${managerName} (previous manager) ---> ${answer.updateManager.split('|').splice(1).join('').trim()} (updated manager)\n`));
+                                console.log(chalk.yellowBright(`${managerName} (previous manager) ---> ${newManagerName} (updated manager)\n`));
                             } else {
                                 console.log(chalk.yellowBright(`${managerName} (previous manager) ---> No manager (updated manager)\n`));
                             }
