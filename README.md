@@ -15,10 +15,11 @@
 ## Installation
 
 1. Clone this repository onto your local computer
-2. Using the MySQL server, run the 'schema.sql' file to create the application database
-3. (Optional) For testing purposes, run the 'seed.sql' file to pre-populate the database
+2. Using the MySQL server, run the 'schema.sql' file (db/schema.sql) to create the application database
+3. (Optional) For testing purposes, run the 'seed.sql' file (db/seed.sql) to pre-populate the database with dummy data
 4. In the command line, navigate to the cloned repository (the 'employee-tracker' directory)
 5. Install the required dependencies by running the command: **npm install** 
+6. Open the 'index.js' file and change the password on line 15 to your own MySQL root password
 
 ## Video Walkthrough
 
