@@ -700,9 +700,10 @@ const viewEmployeeByManagerAll = () => {
 // Displays employees by individual managers
 const viewEmployeeByManagerEach = () => {
     let managers = [];
-    let query = 'SELECT B.id AS manager_id, B.first_name AS manager_first, B.last_name AS manager_last ';
+    let query = 'SELECT B.id AS manager_id, B.first_name AS manager_first, B.last_name AS manager_last, role.title AS role ';
     query += 'FROM employee A ';
-    query += 'JOIN employee B ON A.manager_id = B.id';
+    query += 'JOIN employee B ON A.manager_id = B.id ';
+    query += 'JOIN role ON B.role_id = role.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
         if (res.length < 1) {
@@ -710,8 +711,8 @@ const viewEmployeeByManagerEach = () => {
             setTimeout(viewMenu, 1000);
         } else {
             res.forEach((item) => {
-                if (managers.includes(`${item.manager_id} | ${item.manager_first} ${item.manager_last}`) === false) {
-                    managers.push(`${item.manager_id} | ${item.manager_first} ${item.manager_last}`);
+                if (managers.includes(`${item.manager_id} | ${item.manager_first} ${item.manager_last} | ${item.role}`) === false) {
+                    managers.push(`${item.manager_id} | ${item.manager_first} ${item.manager_last} | ${item.role}`);
                 }
             });
     
